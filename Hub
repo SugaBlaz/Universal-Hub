@@ -1,0 +1,592 @@
+local plrs = game:GetService("Players")
+local plr = plrs.LocalPlayer
+local character = plr.Character or plr.CharacterAdded:Wait()
+local hum = character.Humanoid :: Humanoid
+local TS = game:GetService("TweenService")
+local TPS = game:GetService("TeleportService")
+local RS = game:GetService("RunService")
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
+local camera = workspace.Camera
+
+local enteredkey = false
+
+-- fly
+local speed = 0
+
+local function rejoinGame(delay)
+	local place = game.PlaceId
+	local jobId = game.JobId
+	
+	task.delay(delay, function()
+		TPS:TeleportToPlaceInstance(place, jobId, plr)
+	end)
+end
+
+function init()
+	local ui = UILibrary.new({
+		TitleText = "Universal Hub",
+		Size = UDim2.new(0, 175, 0, 225),
+		Position = UDim2.new(0.5, -140, 0.5, -190),
+		TitleHeight = 30,
+		CornerRadius = 6,
+		ElementPadding = 6,
+		Font = Enum.Font.GothamBold,
+		TextSize = 12,
+		SectionHeight = 20,
+		UIStrokeThickness = 1,
+		SliderColor = Color3.fromRGB(54, 54, 54),
+		NotifcationSound = "rbxassetid://80833448337193",
+		ResetOnSpawn = false,
+		Key = "hi",
+		keyCallBack = function()
+			enteredkey = true
+		end,
+	})
+	
+	repeat 
+		task.wait(0.1)
+	until enteredkey
+	
+	ui:Notify({
+		Title = "Key",
+		Text = "Key Completion done!",
+		Duration = 3,
+		StartPosition = UDim2.new(1, 0, 0.776, 0),
+		EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+		TweenTime = 0.5
+	})
+	
+	ui:AddSection("Main")
+	
+	ui:AddToggle({
+		Text = "Xray",
+		Default = false,
+		Callback = function(state)
+			for _, obj in pairs(workspace:GetDescendants()) do
+				if obj:IsA("BasePart") then
+					local char = obj:FindFirstAncestorOfClass("Model")
+					local isCharacter = char and char:FindFirstChildOfClass("Humanoid") or (obj.Name == "HumanoidRootPart")
+
+					if isCharacter then
+						obj.Transparency = 0
+					else
+						obj.Transparency = state and 0.8 or 0
+					end
+				end
+			end
+		end
+	})
+	
+	local espFolder = {}
+	local espConnection
+
+	ui:AddToggle({
+		Text = "ESP",
+		Default = false,
+		Callback = function(state)
+			local function removeESP(player)
+				if espFolder[player] then
+					if espFolder[player].Gui then espFolder[player].Gui:Destroy() end
+					if espFolder[player].Highlight then espFolder[player].Highlight:Destroy() end
+					espFolder[player] = nil
+				end
+			end
+
+			local function createESP(player)
+				if player == plr then return end
+
+				local head = character:FindFirstChild("Head")
+				local root = hum.RootPart
+
+				if not head or not root then return end
+				removeESP(player)
+
+				local teamColor = player.TeamColor.Color
+
+				local billboard = Instance.new("BillboardGui")
+				billboard.Name = "p_esp"
+				billboard.Size = UDim2.new(0, 200, 0, 70)
+				billboard.StudsOffset = Vector3.new(0, 3, 0)
+				billboard.AlwaysOnTop = true
+				billboard.Adornee = head
+				billboard.Parent = head
+
+				local textLabel = Instance.new("TextLabel")
+				textLabel.Size = UDim2.new(1, 0, 1, 0)
+				textLabel.BackgroundTransparency = 1
+				textLabel.TextColor3 = teamColor
+				textLabel.TextStrokeTransparency = 0.5
+				textLabel.TextSize = 14
+				textLabel.Font = Enum.Font.SourceSansBold
+				textLabel.Parent = billboard
+
+				local highlight = Instance.new("Highlight")
+				highlight.Adornee = character
+				highlight.FillTransparency = 1
+				highlight.OutlineColor = teamColor
+				highlight.Parent = character
+
+				espFolder[player] = {
+					Gui = billboard,
+					Label = textLabel,
+					Highlight = highlight,
+					Root = root
+				}
+			end
+
+			if state then
+				for _, p in ipairs(game.Players:GetPlayers()) do
+					task.spawn(createESP, p)
+				end
+
+				espFolder.AddedConn = game.Players.PlayerAdded:Connect(createESP)
+				espFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeESP)
+
+				espConnection = game:GetService("RunService").RenderStepped:Connect(function()
+					local myRoot = hum.RootPart
+
+					for player, data in pairs(espFolder) do
+						if typeof(player) == "Instance" and player:IsA("Player") and data.Label and data.Root then
+							local teamColor = player.TeamColor.Color
+							data.Label.TextColor3 = teamColor
+							data.Highlight.OutlineColor = teamColor
+
+							if myRoot then
+								local dist = math.floor((myRoot.Position - data.Root.Position).Magnitude)
+								data.Label.Text = string.format("%s\n[%s studs]", player.DisplayName, dist)
+							else
+								data.Label.Text = player.DisplayName
+							end
+						end
+					end
+				end)
+			else
+				if espConnection then espConnection:Disconnect() espConnection = nil end
+				if espFolder.AddedConn then espFolder.AddedConn:Disconnect() end
+				if espFolder.RemovedConn then espFolder.RemovedConn:Disconnect() end
+
+				for player, _ in pairs(espFolder) do
+					if typeof(player) == "Instance" then
+						removeESP(player)
+					end
+				end
+			end
+		end
+	})
+	
+	local hitboxFolder = {}
+	local hitboxConnection
+
+	ui:AddToggle({
+		Text = "Hitbox Shower",
+		Default = false,
+		Callback = function(state)
+			local function removeHitbox(player)
+				if hitboxFolder[player] then
+					for _, adornment in pairs(hitboxFolder[player]) do
+						adornment:Destroy()
+					end
+					hitboxFolder[player] = nil
+				end
+			end
+
+			local function createHitbox(player)
+				if player == plr then return end
+
+				local root = hum.RootPart
+
+				if not root then return end
+				removeHitbox(player)
+
+				local adornment = Instance.new("BoxHandleAdornment")
+				adornment.Name = "HitboxView"
+				adornment.Adornee = root
+				adornment.AlwaysOnTop = true
+				adornment.ZIndex = 10
+				adornment.Transparency = 0.5
+				adornment.Color3 = player.TeamColor.Color
+				adornment.Size = root.Size
+				adornment.Parent = root
+
+				hitboxFolder[player] = {
+					Box = adornment,
+					Part = root
+				}
+			end
+
+			if state then
+				for _, p in ipairs(game.Players:GetPlayers()) do
+					task.spawn(createHitbox, p)
+				end
+
+				hitboxFolder.AddedConn = game.Players.PlayerAdded:Connect(createHitbox)
+				hitboxFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeHitbox)
+
+				hitboxConnection = game:GetService("RunService").RenderStepped:Connect(function()
+					for player, data in pairs(hitboxFolder) do
+						if typeof(player) == "Instance" and player:IsA("Player") then
+							if data.Box and data.Part then
+								data.Box.Color3 = player.TeamColor.Color
+								data.Box.Size = data.Part.Size
+							else
+								task.spawn(createHitbox, player)
+							end
+						end
+					end
+				end)
+			else
+				if hitboxConnection then hitboxConnection:Disconnect() hitboxConnection = nil end
+				if hitboxFolder.AddedConn then hitboxFolder.AddedConn:Disconnect() end
+				if hitboxFolder.RemovedConn then hitboxFolder.RemovedConn:Disconnect() end
+
+				for player, _ in pairs(hitboxFolder) do
+					if typeof(player) == "Instance" then
+						removeHitbox(player)
+					end
+				end
+			end
+		end
+	})
+	
+	local hbExpanderValue = 0
+	local originalSizes = {}
+
+	local function applyHitbox(player)
+		if player == plr then return end
+		local root = hum.RootPart
+
+		if root then
+			if not originalSizes[player] then
+				originalSizes[player] = root.Size
+			end
+
+			if hbExpanderValue > 0 then
+				root.Size = Vector3.new(hbExpanderValue, hbExpanderValue, hbExpanderValue)
+				root.CanCollide = false
+				root.Transparency = 0.5 -- Optional: makes the physical part visible
+			else
+				root.Size = originalSizes[player] or Vector3.new(2, 2, 1)
+				root.Transparency = 1
+			end
+		end
+	end
+
+	ui:AddSlider({
+		Text = "Hitbox Expander",
+		Default = 0,
+		Min = 0,
+		Max = 100,
+		Callback = function(num)
+			hbExpanderValue = num
+			for _, p in ipairs(plrs:GetPlayers()) do
+				applyHitbox(p)
+			end
+		end,
+	})
+
+	plrs.PlayerAdded:Connect(function(p)
+		p.CharacterAdded:Connect(function()
+			task.wait(1)
+			applyHitbox(p)
+		end)
+	end)
+
+	RS.RenderStepped:Connect(function()
+		if hbExpanderValue > 0 then
+			for _, p in ipairs(game.Players:GetPlayers()) do
+				local char = p.Character
+				local root = char and char:FindFirstChild("HumanoidRootPart")
+				if root and root.Size.X ~= hbExpanderValue then
+					applyHitbox(p)
+				end
+			end
+		end
+	end)
+	
+	ui:AddSeparator()
+	
+	ui:AddSection("Character")
+	
+	ui:AddSlider({
+		Text = "WalkSpeed",
+		Default = 16,
+		Min = 0,
+		Max = 200,
+		Callback = function(num)
+			hum.WalkSpeed = num
+		end,
+	})
+
+	ui:AddSlider({
+		Text = "JumpPower",
+		Default = 16,
+		Min = 0,
+		Max = 200,
+		Callback = function(num)
+			hum.WalkSpeed = num
+		end,
+	})
+	
+	ui:AddTextBox({
+		Text = "Fly Speed",
+		Default = "0",
+		Placeholder = "0",
+		Callback = function(text)
+			local num = tonumber(text)
+			if num then
+				speed = num
+			end
+		end,
+	})
+
+	local flyConnection
+	local att, lv, ao
+
+	ui:AddToggle({
+		Text = "Fly",
+		Default = false,
+		Callback = function(state)
+			if flyConnection then flyConnection:Disconnect() flyConnection = nil end
+			if att then att:Destroy() att = nil end
+			if lv then lv:Destroy() lv = nil end
+			if ao then ao:Destroy() ao = nil end
+
+			local root = hum.RootPart
+
+			if not root or not hum then return end
+
+			if state then
+				hum.PlatformStand = true 
+
+				att = Instance.new("Attachment")
+				att.Name = "FlyAtt"
+				att.Position = Vector3.zero
+				att.Parent = root
+
+				lv = Instance.new("LinearVelocity")
+				lv.Attachment0 = att
+				lv.MaxForce = math.huge
+				lv.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+				lv.RelativeTo = Enum.ActuatorRelativeTo.World
+				lv.Parent = root
+
+				ao = Instance.new("AlignOrientation")
+				ao.Attachment0 = att
+				ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
+				ao.RigidityEnabled = true 
+				ao.Parent = root
+
+				flyConnection = game:GetService("RunService").RenderStepped:Connect(function()
+					if not root or not hum then return end
+
+					local moveDir = hum.MoveDirection
+					local camCF = camera.CFrame
+
+					if moveDir.Magnitude > 0 then
+						local lateralMove = camCF:VectorToObjectSpace(moveDir)
+						lv.VectorVelocity = camCF:VectorToWorldSpace(Vector3.new(lateralMove.X, 0, lateralMove.Z)) * speed
+					else
+						lv.VectorVelocity = Vector3.zero
+					end
+
+					ao.CFrame = camCF
+				end)
+			else
+				if hum then
+					hum.PlatformStand = false
+					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+				end
+			end
+		end,
+	})
+	
+	local noclipRadius = 10
+	
+	ui:AddTextBox({
+		Text = "Noclip Radius",
+		Default = "10",
+		Placeholder = "10",
+		Callback = function(text)
+			local num = tonumber(text)
+			if num then
+				noclipRadius = num
+			end
+		end,
+	})
+
+	local noclipConnection
+	local affectedParts = {}
+
+	ui:AddToggle({
+		Text = "Noclip",
+		Default = false,
+		Callback = function(state)
+			if state then
+				noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+					local root = hum.RootPart
+					if not character or not root then return end
+
+					local params = RaycastParams.new()
+					params.FilterDescendantsInstances = {character}
+					params.FilterType = Enum.RaycastFilterType.Exclude
+					local ray = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), params)
+					local ground = ray and ray.Instance
+
+					for _, v in pairs(character:GetDescendants()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = false
+						end
+					end
+
+					local nearby = workspace:GetPartBoundsInRadius(root.Position, noclipRadius)
+					local currentFrameParts = {}
+
+					for _, part in pairs(nearby) do
+						if part:IsA("BasePart") and part ~= ground and not part:IsDescendantOf(character) then
+							local relativeDiff = part.Position.Y - (root.Position.Y - 2.5)
+
+							if relativeDiff > 0.5 then
+								if affectedParts[part] == nil then
+									affectedParts[part] = part.CanCollide
+								end
+								part.CanCollide = false
+								currentFrameParts[part] = true
+							end
+						end
+					end
+
+					for part, _ in pairs(affectedParts) do
+						if not currentFrameParts[part] then
+							part.CanCollide = affectedParts[part]
+							affectedParts[part] = nil
+						end
+					end
+				end)
+			else
+				if noclipConnection then 
+					noclipConnection:Disconnect() 
+					noclipConnection = nil 
+				end
+
+				for part, originalValue in pairs(affectedParts) do
+					if part and part.Parent then
+						part.CanCollide = originalValue
+					end
+				end
+
+				table.clear(affectedParts)
+
+				if character then
+					for _, v in pairs(character:GetDescendants()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = true
+						end
+					end
+				end
+			end
+		end
+	})
+	
+	ui:AddSeparator()
+	
+	ui:AddSection("Trolling")
+	
+	local flingPowerValue = 0
+	
+	ui:AddTextBox({
+		Text = "Fling Power",
+		Default = "0",
+		Placeholder = "0",
+		Callback = function(text)
+			local num = tonumber(text)
+			if num then
+				flingPowerValue = num
+			end
+		end,
+	})
+
+	local flingAV
+	local flingatt
+	local flinggyro
+	local flingconn
+
+	ui:AddToggle({
+		Text = "Fling",
+		Default = false,
+		Callback = function(state)
+			local char = game.Players.LocalPlayer.Character
+			local root = char and char:FindFirstChild("HumanoidRootPart")
+			local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+			if not root or not hum then return end
+
+			if state then
+				flingatt = Instance.new("Attachment", root)
+				flingatt.Name = "FlingAttachment"
+
+				flingAV = Instance.new("AngularVelocity", root)
+				flingAV.Attachment0 = flingatt
+				flingAV.MaxTorque = math.huge
+				flingAV.AngularVelocity = Vector3.new(0, flingPowerValue, 0)
+
+				flinggyro = Instance.new("BodyGyro", root)
+				flinggyro.P = 3000
+				flinggyro.MaxTorque = Vector3.new(math.huge, 0, math.huge)
+				flinggyro.CFrame = root.CFrame
+
+				hum.AutoRotate = false
+
+				flingconn = game:GetService("RunService").PostSimulation:Connect(function()
+					hum.PlatformStand = false
+					hum:ChangeState(Enum.HumanoidStateType.Running)
+
+					if hum.MoveDirection.Magnitude > 0 then
+						root.Velocity = hum.MoveDirection * hum.WalkSpeed + Vector3.new(0, root.Velocity.Y, 0)
+					end
+
+					root.RotVelocity = Vector3.new(0, root.RotVelocity.Y, 0)
+				end)
+			else
+				if flingAV then flingAV:Destroy() end
+				if flingatt then flingatt:Destroy() end
+				if flinggyro then flinggyro:Destroy() end
+				if flingconn then flingconn:Disconnect() end
+
+				hum.AutoRotate = true
+				hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+			end
+		end,
+	})
+	
+	ui:AddSeparator()
+
+	ui:AddSection("Ui Controls")
+
+	ui:AddButton({
+		Text = "Destroy Ui",
+		Callback = function()
+			ui:Destroy()
+		end
+	})
+
+	ui:AddButton({
+		Text = "Restart Ui",
+		Callback = function()
+			enteredkey = false
+			ui:Destroy()
+			task.wait(.5)
+			init()
+		end
+	})
+
+	ui:AddSeparator()
+
+	ui:AddSection("Credits")
+
+	ui:AddLabel("Made By SugaBlaz")
+	ui:AddLabel("Thanks to: Hmmm5650 for this cool ui library!")
+
+	ui:AddSeparator()
+end
+
+init()
