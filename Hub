@@ -97,38 +97,45 @@ function initServerList()
 	
 	local function getServers(cursor)
 		local HttpService = game:GetService("HttpService")
-		local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-		local API_URL = "https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=25"
-
+		local API_URL = "https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100"
 		local placeId = game.PlaceId
 		local url = string.format(API_URL, tostring(placeId))
-
+	
 		if cursor then
 			url = url .. "&cursor=" .. cursor
 		end
+	
+		-- The actual request happens here
+		local success, result = pcall(function()
+			return HttpService:GetAsync(url)
+		end)
 
-		 if not success then
-        	warn("Network/Proxy Error: " .. tostring(result))
-       		return nil
-   		 end
-
-	    -- Check if the result exists and looks like JSON
-	    if result and result:sub(1,1) == "{" then
-	        local decodeSuccess, decodedData = pcall(function()
-	            return HttpService:JSONDecode(result)
-	        end)
-	        
-	        if decodeSuccess then
-	            return decodedData
-	        else
-	            warn("JSON Decode Error: The API returned invalid data.")
-	        end
-	    else
-	        warn("Unexpected Response: " .. tostring(result))
-	    end
-	    
-	    return nil
+		if not success then
+			local s, r = pcall(function()
+				return game:HttpGet(url)
+			end)
+		end
+	
+		if not success then
+			warn("Network/Proxy Error: " .. tostring(result))
+			return nil
+		end
+	
+		if result and result:sub(1,1) == "{" then
+			local decodeSuccess, decodedData = pcall(function()
+				return HttpService:JSONDecode(result)
+			end)
+			
+			if decodeSuccess then
+				return decodedData
+			else
+				warn("JSON Decode Error: The API returned invalid data.")
+			end
+		else
+			warn("Unexpected Response: " .. tostring(result))
+		end
+		
+		return nil
 	end
 
 	
