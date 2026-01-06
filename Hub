@@ -108,17 +108,29 @@ function initServerList()
 			url = url .. "&cursor=" .. cursor
 		end
 
-		local success, result = pcall(function()
-			return HttpService:GetAsync(url)
-		end)
+		 if not success then
+        	warn("Network/Proxy Error: " .. tostring(result))
+       		return nil
+   		 end
 
-		if success then
-			return HttpService:JSONDecode(result)
-		else
-			warn("API Error: " .. result)
-			return nil
-		end
+	    -- Check if the result exists and looks like JSON
+	    if result and result:sub(1,1) == "{" then
+	        local decodeSuccess, decodedData = pcall(function()
+	            return HttpService:JSONDecode(result)
+	        end)
+	        
+	        if decodeSuccess then
+	            return decodedData
+	        else
+	            warn("JSON Decode Error: The API returned invalid data.")
+	        end
+	    else
+	        warn("Unexpected Response: " .. tostring(result))
+	    end
+	    
+	    return nil
 	end
+
 	
 	local function createtemp(serverid: string, players: number, maxplayers: number, region: string, ping: number)
 		local temp = Instance.new("Frame")
@@ -237,9 +249,10 @@ function init()
 					local char = obj:FindFirstAncestorOfClass("Model")
 					local isCharacter = char and char:FindFirstChildOfClass("Humanoid")
 
-					if isCharacter and not (obj.Name == "HumanoidRootPart") then
+					if isCharacter then
 						obj.Transparency = 0
 					else
+						if state and obj.Name == "HumanoidRootPart" then obj.Transparency = 0 end
 						obj.Transparency = state and 0.8 or 0
 					end
 				end
@@ -305,18 +318,18 @@ function init()
 			end
 
 			if state then
-				for _, p in ipairs(game.Players:GetPlayers()) do
+				for _, p in ipairs(plrs:GetPlayers()) do
 					task.spawn(createESP, p)
 				end
 
-				espFolder.AddedConn = game.Players.PlayerAdded:Connect(createESP)
-				espFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeESP)
+				espFolder.AddedConn = plrs.PlayerAdded:Connect(createESP)
+				espFolder.RemovedConn = plrs.PlayerRemoving:Connect(removeESP)
 
 				espConnection = game:GetService("RunService").RenderStepped:Connect(function()
 					local myRoot = hum.RootPart
 
 					for player, data in pairs(espFolder) do
-						if typeof(player) == "Instance" and player:IsA("Player") and data.Label and data.Root then
+						if player and data.Label and data.Root then
 							local teamColor = player.TeamColor.Color
 							data.Label.TextColor3 = teamColor
 							data.Highlight.OutlineColor = teamColor
@@ -336,7 +349,7 @@ function init()
 				if espFolder.RemovedConn then espFolder.RemovedConn:Disconnect() end
 
 				for player, _ in pairs(espFolder) do
-					if typeof(player) == "Instance" then
+					if player then
 						removeESP(player)
 					end
 				end
