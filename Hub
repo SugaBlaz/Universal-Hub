@@ -190,7 +190,7 @@ function initServerList()
 		corner2.Parent = join
 		
 		join.MouseButton1Click:Connect(function()
-			TPS:TeleportToPlace(game.PlaceId, serverid, plr)
+			TPS:TeleportToPlaceInstance(game.PlaceId, serverid, plr)
 		end)
 	end
 	
@@ -349,7 +349,7 @@ function init()
 			end
 	
 			if state then
-				for _, p in ipairs(game.Players:GetPlayers()) do
+				for _, p in ipairs(plrs:GetPlayers()) do
 					createESP(p)
 				end
 	
