@@ -207,7 +207,7 @@ function init()
 		SliderColor = Color3.fromRGB(54, 54, 54),
 		NotifcationSound = "rbxassetid://80833448337193",
 		ResetOnSpawn = false,
-		Key = "hi",
+		Key = "azka_mau_eek_eek",
 		keyCallBack = function()
 			enteredkey = true
 		end,
