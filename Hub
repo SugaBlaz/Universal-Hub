@@ -235,9 +235,9 @@ function init()
 			for _, obj in pairs(workspace:GetDescendants()) do
 				if obj:IsA("BasePart") then
 					local char = obj:FindFirstAncestorOfClass("Model")
-					local isCharacter = char and char:FindFirstChildOfClass("Humanoid") or (obj.Name == "HumanoidRootPart")
+					local isCharacter = char and char:FindFirstChildOfClass("Humanoid")
 
-					if isCharacter then
+					if isCharacter and not (obj.Name == "HumanoidRootPart") then
 						obj.Transparency = 0
 					else
 						obj.Transparency = state and 0.8 or 0
@@ -291,10 +291,10 @@ function init()
 				textLabel.Parent = billboard
 
 				local highlight = Instance.new("Highlight")
-				highlight.Adornee = character
+				highlight.Adornee = player.Character
 				highlight.FillTransparency = 1
 				highlight.OutlineColor = teamColor
-				highlight.Parent = character
+				highlight.Parent = player.Character
 
 				espFolder[player] = {
 					Gui = billboard,
