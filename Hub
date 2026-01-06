@@ -112,6 +112,8 @@ function initServerList()
 
 		if not success then
 			local s, r = pcall(function()
+				result = r
+				success = s
 				return game:HttpGet(url)
 			end)
 		end
