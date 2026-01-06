@@ -265,8 +265,8 @@ function init()
 			local function createESP(player)
 				if player == plr then return end
 
-				local head = character:FindFirstChild("Head")
-				local root = hum.RootPart
+				local head = player.character:FindFirstChild("Head")
+				local root = character:FindFirstChild("HumanoidRootPart")
 
 				if not head or not root then return end
 				removeESP(player)
@@ -363,7 +363,7 @@ function init()
 			local function createHitbox(player)
 				if player == plr then return end
 
-				local root = hum.RootPart
+				local root = player.Character:FindFirstChild("HuamnoidRootPart")
 
 				if not root then return end
 				removeHitbox(player)
@@ -423,7 +423,7 @@ function init()
 
 	local function applyHitbox(player)
 		if player == plr then return end
-		local root = hum.RootPart
+		local root = player.Character:FindFirstChild("HuamnoidRootPart")
 
 		if root then
 			if not originalSizes[player] then
