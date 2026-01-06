@@ -7,18 +7,188 @@ local TPS = game:GetService("TeleportService")
 local RS = game:GetService("RunService")
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
 local camera = workspace.Camera
+local Http = game:GetService("HttpService")
+local Api = "https://games.roproxy.com/v1/games/"
 
 local enteredkey = false
 
--- fly
-local speed = 0
-
-local function rejoinGame(delay)
-	local place = game.PlaceId
-	local jobId = game.JobId
+function initServerList()
+	local ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.Name = "ServerList"
+	ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	ScreenGui.ResetOnSpawn = true
 	
-	task.delay(delay, function()
-		TPS:TeleportToPlaceInstance(place, jobId, plr)
+	local ServerFrame = Instance.new("Frame")
+	ServerFrame.Name = "ServerFrame"
+	ServerFrame.Size = UDim2.new(0, 362,0, 224)
+	ServerFrame.Position = UDim2.new(0.5, 0,0.5, 0)
+	ServerFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+	ServerFrame.BorderSizePixel = 0
+	ServerFrame.Active = true
+	ServerFrame.Draggable = true
+	ServerFrame.ClipsDescendants = true
+	ServerFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	ServerFrame.Parent = ScreenGui
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = ServerFrame
+
+	local uiStroke = Instance.new("UIStroke")
+	uiStroke.Thickness = 1
+	uiStroke.Color = Color3.fromRGB(60, 60, 60)
+	uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	uiStroke.Parent = ServerFrame
+
+	local title = Instance.new("Frame")
+	title.Name = "titlebar"
+	title.Size = UDim2.new(1, 0, 0.054, 30)
+	title.Position = UDim2.new(0, 0, 0, 0)
+	title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	title.BorderSizePixel = 0
+	title.ZIndex = 2
+	title.Parent = ServerFrame
+
+	local keytitleCorner = Instance.new("UICorner")
+	keytitleCorner.CornerRadius = UDim.new(0, 6)
+	keytitleCorner.Parent = title
+
+	local titletext = Instance.new("TextLabel")
+	titletext.Name = "titletext"
+	titletext.Size = UDim2.new(0.944, 0, 1, 0)
+	titletext.Position = UDim2.new(0, 12, 0, 0)
+	titletext.BackgroundTransparency = 1
+	titletext.Text = "Server List"
+	titletext.TextColor3 = Color3.fromRGB(255, 255, 255)
+	titletext.TextXAlignment = Enum.TextXAlignment.Left
+	titletext.Font = Enum.Font.GothamBold
+	titletext.TextSize = 14
+	titletext.ZIndex = 3
+	titletext.Parent = title
+	
+	local close = Instance.new("TextButton")
+	close.Name = "close"
+	close.Size = UDim2.new(0, 43, 0, 43)
+	close.Position = UDim2.new(0.878, 0, 0, 0)
+	close.BackgroundTransparency = 1
+	close.Text = "X"
+	close.TextColor3 = Color3.fromRGB(255, 0, 0)
+	close.Font = Enum.Font.GothamBold
+	close.TextSize = 30
+	close.ZIndex = 2
+	close.Parent = ServerFrame
+	
+	local serverlist = Instance.new("ScrollingFrame")
+	serverlist.Name = "serverlist"
+	serverlist.Size = UDim2.new(1, 0, 1, -30)
+	serverlist.Position = UDim2.new(0, 0, 0, 30)
+	serverlist.BackgroundTransparency = 1
+	serverlist.Parent = ServerFrame
+	
+	local serverlistcorner = Instance.new("UICorner")
+	serverlistcorner.CornerRadius = UDim.new(0, 6)
+	serverlistcorner.Parent = serverlist
+	
+	local serverlistlayout = Instance.new("UIListLayout")
+	serverlistlayout.Padding = UDim.new(0.05, 0)
+	serverlistlayout.SortOrder = Enum.SortOrder.LayoutOrder
+	serverlistlayout.Parent = serverlist
+	
+	local function getServers(cursor)
+		local HttpService = game:GetService("HttpService")
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+		local API_URL = "https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=25"
+
+		local placeId = game.PlaceId
+		local url = string.format(API_URL, tostring(placeId))
+
+		if cursor then
+			url = url .. "&cursor=" .. cursor
+		end
+
+		local success, result = pcall(function()
+			return HttpService:GetAsync(url)
+		end)
+
+		if success then
+			return HttpService:JSONDecode(result)
+		else
+			warn("API Error: " .. result)
+			return nil
+		end
+	end
+	
+	local function createtemp(serverid: string, players: number, maxplayers: number, region: string, ping: number)
+		local temp = Instance.new("Frame")
+		temp.Name = serverid
+		temp.Size = UDim2.new(1, 0, 0, 63)
+		temp.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
+		temp.Parent = serverlist
+		
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 6)
+		corner.Parent = temp
+		
+		local serveridtext = Instance.new("TextLabel")
+		serveridtext.Name = "serveridtext"
+		serveridtext.Size = UDim2.new(0.6, 0, 0.5, 0)
+		serveridtext.Position = UDim2.new(0, 0, 0, 0)
+		serveridtext.BackgroundTransparency = 1
+		serveridtext.Text = "Server ID: " .. serverid .. " | Region: " .. region .. " | Ping: " .. ping .. "ms"
+		serveridtext.Font = Enum.Font.GothamBold
+		serveridtext.TextScaled = true
+		serveridtext.TextColor3 = Color3.fromRGB(255, 255, 255)
+		serveridtext.Parent = temp
+		
+		local playerstext = Instance.new("TextLabel")
+		playerstext.Name = "serveridtext"
+		playerstext.Size = UDim2.new(0.6, 0, 0.5, 0)
+		playerstext.Position = UDim2.new(0, 0, 0.5, 0)
+		playerstext.BackgroundTransparency = 1
+		playerstext.Text = "Players: " .. players .. "/" .. maxplayers
+		playerstext.Font = Enum.Font.GothamBold
+		playerstext.TextScaled = true
+		playerstext.TextColor3 = Color3.fromRGB(255, 255, 255)
+		playerstext.Parent = temp
+		
+		local join = Instance.new("TextButton")
+		join.Name = "join"
+		join.Size = UDim2.new(0.3, 0, 0.8, 0)
+		join.Position = UDim2.new(0.64, 0, 0.1, 0)
+		join.BackgroundColor3 = Color3.fromRGB(0, 157, 0)
+		join.Text = "Join"
+		join.Font = Enum.Font.GothamBold
+		join.TextSize = 30
+		join.TextColor3 = Color3.fromRGB(255, 255, 255)
+		join.Parent = temp
+		
+		local corner2 = Instance.new("UICorner")
+		corner2.CornerRadius = UDim.new(0, 6)
+		corner2.Parent = join
+		
+		join.MouseButton1Click:Connect(function()
+			TPS:TeleportToPlace(game.PlaceId, serverid, plr)
+		end)
+	end
+	
+	task.spawn(function()
+		local response = getServers()
+
+		if response and response.data then
+			serverlist.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+			for i, v in pairs(response.data) do
+				createtemp(v.id, v.playing, v.maxPlayers, "Public", v.ping or 0)
+			end
+		else
+			warn("No servers found or API error occurred.")
+		end
+	end)
+	
+	close.MouseButton1Click:Connect(function()
+		ServerFrame:Destroy()
 	end)
 end
 
@@ -303,6 +473,148 @@ function init()
 		end
 	end)
 	
+	local aimconn = nil
+	
+	ui:AddToggle({
+		Text = "Aimbot",
+		Default = false,
+
+		Callback = function(state)
+			if state then
+				local function getNearestPlayer(originPosition)
+					local closestPlayer = nil
+					local shortestDistance = math.huge
+
+					for _, player in ipairs(plrs:GetPlayers()) do
+						if player ~= plr then
+							local character = player.Character
+							if character and character:FindFirstChild("HumanoidRootPart") then
+								local distance = (character.HumanoidRootPart.Position - originPosition).Magnitude
+								if distance < shortestDistance then
+									shortestDistance = distance
+									closestPlayer = player
+								end
+							end
+						end
+					end
+
+					return closestPlayer
+				end
+
+				local function faceTarget(target)
+					if target and character and character.HumanoidRootPart then
+						local charHRP = character.HumanoidRootPart
+						local dir = (target.HumanoidRootPart.Position - charHRP.Position).Unit
+						dir = Vector3.new(dir.X, 0, dir.Z)
+						charHRP.CFrame = CFrame.new(charHRP.Position, charHRP.Position + dir)
+					end
+				end
+				
+				local hrp = character:FindFirstChild("HumanoidRootPart")
+				local target = getNearestPlayer(hrp.Position)		
+
+				if target then
+					aimconn = RS.RenderStepped:Connect(function()
+						local targetchar = target.Character
+						local targetPos = targetchar.HumanoidRootPart.Position
+						local camPos = hrp.Position
+						camera.CFrame = CFrame.new(camPos, targetPos)
+						faceTarget(targetchar)
+					end)
+				else
+					ui:Notify({
+						Title = "Error",
+						Text = "Player not found!",
+						Duration = 3,
+						StartPosition = UDim2.new(1, 0, 0.776, 0),
+						EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+						TweenTime = 0.5
+					})
+				end
+			else
+				if aimconn then
+					aimconn:Disconnect()
+					aimconn = nil
+				end
+			end
+		end,
+	})
+	
+	ui:AddTextBox({
+		Text = "Go to:",
+		Default = "",
+		Placeholder = "Player Name or 'random'",
+
+		Callback = function(text)
+			if text == "" then return end
+
+			text = text:lower()
+			local playersList = plrs:GetPlayers()
+			local target = nil
+
+			if text == "random" then
+				if #playersList > 1 then
+					local others = {}
+					for _, p in ipairs(playersList) do
+						if p ~= plr then table.insert(others, p) end
+					end
+					target = others[math.random(1, #others)]
+				else
+					target = playersList[1]
+				end
+			end
+
+			if not target then
+				for _, plr in ipairs(playersList) do
+					if plr.Name:lower() == text or plr.DisplayName:lower() == text then
+						target = plr
+						break
+					end
+				end
+			end
+
+			if not target then
+				local bestScore = 0
+				for _, plr in ipairs(playersList) do
+					local nameLower = plr.Name:lower()
+					local displayLower = plr.DisplayName:lower()
+
+					local function getMatchScore(targetName)
+						local score = 0
+						for i = 1, math.min(#text, #targetName) do
+							if text:sub(i, i) == targetName:sub(i, i) then
+								score += 1
+							else
+								break
+							end
+						end
+						return score
+					end
+
+					local score = math.max(getMatchScore(nameLower), getMatchScore(displayLower))
+
+					if score > bestScore then
+						bestScore = score
+						target = plr
+					end
+				end
+			end
+
+			if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+				character:PivotTo(target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3))
+			else
+				ui:Notify({
+					Title = "Error",
+					Text = "Player not found or has no character",
+					Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
+				})
+			end
+		end
+	})
+	
 	ui:AddSeparator()
 	
 	ui:AddSection("Character")
@@ -326,6 +638,8 @@ function init()
 			hum.WalkSpeed = num
 		end,
 	})
+	
+	local speed = 0
 	
 	ui:AddTextBox({
 		Text = "Fly Speed",
@@ -404,8 +718,8 @@ function init()
 	
 	ui:AddTextBox({
 		Text = "Noclip Radius",
-		Default = "10",
-		Placeholder = "10",
+		Default = "0",
+		Placeholder = "0",
 		Callback = function(text)
 			local num = tonumber(text)
 			if num then
@@ -487,6 +801,74 @@ function init()
 		end
 	})
 	
+	local infJumpConnection = nil
+
+	ui:AddToggle({
+		Text = "Infinite Jump",
+		Default = false,
+		Callback = function(Value)
+			if Value then
+				infJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+					local character = game.Players.LocalPlayer.Character
+					if character then
+						local hum = character:FindFirstChildOfClass("Humanoid")
+						if hum then
+							hum:ChangeState(Enum.HumanoidStateType.Jumping)
+						end
+					end
+				end)
+			else
+				if infJumpConnection then
+					infJumpConnection:Disconnect()
+					infJumpConnection = nil
+				end
+			end
+		end
+	})
+	
+	ui:AddSeparator()
+	
+	ui:AddSection("Admin")
+	
+	ui:AddButton({
+		Text = "Infinite Yield",
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Namless Admin (Reworked, use at own risk)",
+		TextSize = 6,
+		Callback = function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/Nameless-Admin/main/Source.lua"))()
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Namless Admin (Orginal)",
+		TextSize = 10,
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Fedora Admin",
+
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/alexx1212/fedoratoomutch/main/toomucth'))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Cmd X",
+
+		Callback = function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source", true))()
+		end,
+	})
+	
 	ui:AddSeparator()
 	
 	ui:AddSection("Trolling")
@@ -557,8 +939,206 @@ function init()
 			end
 		end,
 	})
+
+	local SKY_HEIGHT = 700
+	
+	ui:AddTextBox({
+		Text = "Sky Height",
+		Default = "700",
+		Placeholder = "0",
+		Callback = function(text)
+			local num = tonumber(text)
+			if num then
+				SKY_HEIGHT = num
+			end
+		end,
+	})
+	
+	local storedPos
+	local invisConn
+	local ghost
+	
+	ui:AddToggle({
+		Text = "Invisiblity",
+		Default = false,
+		Callback = function(state)
+			if state then
+				local realChar = character
+				local hrp = hum.RootPart
+				character.Archivable = true
+				storedPos = hrp.CFrame
+
+				invisConn = RS.RenderStepped:Connect(function()
+					hrp.CFrame = storedPos * CFrame.new(0, SKY_HEIGHT, 0)
+				end)
+
+				ghost = realChar:Clone()
+				ghost.Parent = workspace
+
+				for _, part in ipairs(ghost:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.Anchored = false
+						part.CanCollide = true
+						part.Transparency = 0.8
+					end
+				end
+
+				ghost:WaitForChild("HumanoidRootPart").CFrame = storedPos
+
+				camera.CameraSubject = ghost:WaitForChild("Humanoid")
+				plr.Character = ghost
+			else
+				if ghost then
+					local realChar = plr.Character.Parent:FindFirstChild(plr.Name) or character
+
+					invisConn:Disconnect()
+					invisConn = nil
+
+					if realChar then
+						realChar:PivotTo(ghost.HumanoidRootPart.CFrame)
+					end
+
+					ghost:Destroy()
+					ghost = nil
+				end
+
+				plr.Character = character
+				camera.CameraSubject = character:WaitForChild("Humanoid")
+			end
+		end,
+	})
 	
 	ui:AddSeparator()
+	
+	ui:AddSection("Server")
+	
+	ui:AddButton({
+		Text = "Open Server List",
+		Callback = function()
+			initServerList()
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Join Smallest Server",
+		Callback = function()
+			local _place = game.PlaceId
+			local _currentServer = game.JobId
+			local _apiURL = Api .. _place .. "/servers/Public?sortOrder=Asc&limit=100"
+
+			local function ListServers(cursor)
+				local success, Raw = pcall(function()
+					return game:HttpGet(_apiURL .. ((cursor and "&cursor="..cursor) or ""))
+				end)
+
+				if success then
+					return Http:JSONDecode(Raw)
+				end
+				return nil
+			end
+
+			local NextCursor = nil
+			local targetServer = nil
+
+			for i = 1, 5 do 
+				local Servers = ListServers(NextCursor)
+
+				if Servers and Servers.data then
+					for _, server in pairs(Servers.data) do
+						if server.id ~= _currentServer and server.playing < server.maxPlayers then
+							targetServer = server
+							break
+						end
+					end
+				end
+
+				if targetServer then break end
+
+				if Servers and Servers.nextPageCursor then
+					NextCursor = Servers.nextPageCursor
+				else
+					break
+				end
+			end
+
+			if targetServer then
+				TPS:TeleportToPlaceInstance(_place, targetServer.id, plr)
+			else
+				ui:Notify({
+					Title = "Server Failure",
+					Text = "Couldnt find a different smallest server.",
+					Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
+				})
+			end
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Server Hop",
+		Callback = function()
+			local HttpService = game:GetService("HttpService")
+			
+			local PlaceId = game.PlaceId
+			local JobId = game.JobId
+			local Api = "https://games.roproxy.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
+
+			local success, result = pcall(function()
+				return game:HttpGet(Api) 
+			end)
+
+			if success then
+				local decoded = HttpService:JSONDecode(result)
+				if decoded and decoded.data then
+					local possibleServers = {}
+
+					for _, server in pairs(decoded.data) do
+						if server.id ~= JobId and server.playing < server.maxPlayers then
+							table.insert(possibleServers, server.id)
+						end
+					end
+
+					if #possibleServers > 0 then
+						local randomId = possibleServers[math.random(1, #possibleServers)]
+						TPS:TeleportToPlaceInstance(PlaceId, randomId, game.Players.LocalPlayer)
+					else
+						ui:Notify({
+							Title = "Server Failure",
+							Text = "No other servers found to hop to.",
+							Duration = 3,
+							StartPosition = UDim2.new(1, 0, 0.776, 0),
+							EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+							TweenTime = 0.5
+						})
+					end
+				end
+			else
+				ui:Notify({
+					Title = "Server Failure",
+					Text = "Failed to fetch server list: " .. tostring(result),
+					Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
+				})
+			end
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Rejoin server",
+		Callback = function()
+			local place = game.PlaceId
+			local jobId = game.JobId
+			local delay = 2
+
+			task.delay(delay, function()
+				TPS:TeleportToPlaceInstance(place, jobId, plr)
+			end)
+		end,
+	})
 
 	ui:AddSection("Ui Controls")
 
@@ -566,6 +1146,7 @@ function init()
 		Text = "Destroy Ui",
 		Callback = function()
 			ui:Destroy()
+			script:Destroy()
 		end
 	})
 
@@ -575,7 +1156,8 @@ function init()
 			enteredkey = false
 			ui:Destroy()
 			task.wait(.5)
-			init()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+			script:Destroy()
 		end
 	})
 
@@ -587,6 +1169,18 @@ function init()
 	ui:AddLabel("Thanks to: Hmmm5650 for this cool ui library!")
 
 	ui:AddSeparator()
+	
+	game:GetService("UserInputService").InputBegan:Connect(function(inp, gpe)
+		if gpe then return end
+		
+		if inp.KeyCode == Enum.KeyCode.F2 then
+			enteredkey = false
+			ui:Destroy()
+			task.wait(.5)
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+			script:Destroy()
+		end
+	end)
 end
 
 init()
