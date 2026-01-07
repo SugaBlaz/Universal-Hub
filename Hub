@@ -18,7 +18,7 @@ function initServerList()
 	ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.ResetOnSpawn = true
-	
+
 	local ServerFrame = Instance.new("Frame")
 	ServerFrame.Name = "ServerFrame"
 	ServerFrame.Size = UDim2.new(0, 362,0, 224)
@@ -66,7 +66,7 @@ function initServerList()
 	titletext.TextSize = 14
 	titletext.ZIndex = 3
 	titletext.Parent = title
-	
+
 	local close = Instance.new("TextButton")
 	close.Name = "close"
 	close.Size = UDim2.new(0, 43, 0, 43)
@@ -78,33 +78,33 @@ function initServerList()
 	close.TextSize = 30
 	close.ZIndex = 2
 	close.Parent = ServerFrame
-	
+
 	local serverlist = Instance.new("ScrollingFrame")
 	serverlist.Name = "serverlist"
 	serverlist.Size = UDim2.new(1, 0, 1, -30)
 	serverlist.Position = UDim2.new(0, 0, 0, 30)
 	serverlist.BackgroundTransparency = 1
 	serverlist.Parent = ServerFrame
-	
+
 	local serverlistcorner = Instance.new("UICorner")
 	serverlistcorner.CornerRadius = UDim.new(0, 6)
 	serverlistcorner.Parent = serverlist
-	
+
 	local serverlistlayout = Instance.new("UIListLayout")
 	serverlistlayout.Padding = UDim.new(0.05, 0)
 	serverlistlayout.SortOrder = Enum.SortOrder.LayoutOrder
 	serverlistlayout.Parent = serverlist
-	
+
 	local function getServers(cursor)
 		local HttpService = game:GetService("HttpService")
 		local API_URL = "https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100"
 		local placeId = game.PlaceId
 		local url = string.format(API_URL, tostring(placeId))
-	
+
 		if cursor then
 			url = url .. "&cursor=" .. cursor
 		end
-	
+
 		-- The actual request happens here
 		local success, result = pcall(function()
 			return HttpService:GetAsync(url)
@@ -117,17 +117,17 @@ function initServerList()
 				return game:HttpGet(url)
 			end)
 		end
-	
+
 		if not success then
 			warn("Network/Proxy Error: " .. tostring(result))
 			return nil
 		end
-	
+
 		if result and result:sub(1,1) == "{" then
 			local decodeSuccess, decodedData = pcall(function()
 				return HttpService:JSONDecode(result)
 			end)
-			
+
 			if decodeSuccess then
 				return decodedData
 			else
@@ -136,22 +136,22 @@ function initServerList()
 		else
 			warn("Unexpected Response: " .. tostring(result))
 		end
-		
+
 		return nil
 	end
 
-	
+
 	local function createtemp(serverid: string, players: number, maxplayers: number, region: string, ping: number)
 		local temp = Instance.new("Frame")
 		temp.Name = serverid
 		temp.Size = UDim2.new(1, 0, 0, 63)
 		temp.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
 		temp.Parent = serverlist
-		
+
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(0, 6)
 		corner.Parent = temp
-		
+
 		local serveridtext = Instance.new("TextLabel")
 		serveridtext.Name = "serveridtext"
 		serveridtext.Size = UDim2.new(0.6, 0, 0.5, 0)
@@ -162,7 +162,7 @@ function initServerList()
 		serveridtext.TextScaled = true
 		serveridtext.TextColor3 = Color3.fromRGB(255, 255, 255)
 		serveridtext.Parent = temp
-		
+
 		local playerstext = Instance.new("TextLabel")
 		playerstext.Name = "serveridtext"
 		playerstext.Size = UDim2.new(0.6, 0, 0.5, 0)
@@ -173,7 +173,7 @@ function initServerList()
 		playerstext.TextScaled = true
 		playerstext.TextColor3 = Color3.fromRGB(255, 255, 255)
 		playerstext.Parent = temp
-		
+
 		local join = Instance.new("TextButton")
 		join.Name = "join"
 		join.Size = UDim2.new(0.3, 0, 0.8, 0)
@@ -184,16 +184,16 @@ function initServerList()
 		join.TextSize = 30
 		join.TextColor3 = Color3.fromRGB(255, 255, 255)
 		join.Parent = temp
-		
+
 		local corner2 = Instance.new("UICorner")
 		corner2.CornerRadius = UDim.new(0, 6)
 		corner2.Parent = join
-		
+
 		join.MouseButton1Click:Connect(function()
 			TPS:TeleportToPlaceInstance(game.PlaceId, serverid, plr)
 		end)
 	end
-	
+
 	task.spawn(function()
 		local response = getServers()
 
@@ -207,7 +207,7 @@ function initServerList()
 			warn("No servers found or API error occurred.")
 		end
 	end)
-	
+
 	close.MouseButton1Click:Connect(function()
 		ServerFrame:Destroy()
 	end)
@@ -233,11 +233,11 @@ function init()
 			enteredkey = true
 		end,
 	})
-	
+
 	repeat 
 		task.wait(0.1)
 	until enteredkey
-	
+
 	ui:Notify({
 		Title = "Key",
 		Text = "Key Completion done!",
@@ -246,35 +246,35 @@ function init()
 		EndPosition = UDim2.new(0.724, 0, 0.776, 0),
 		TweenTime = 0.5
 	})
-	
+
 	ui:AddSection("Main")
-	
+
 	ui:AddToggle({
-	    Text = "Xray",
-	    Default = false,
+		Text = "Xray",
+		Default = false,
 		Callback = function(state)
-	        for _, obj in pairs(workspace:GetDescendants()) do
-	            if obj:IsA("BasePart") then
-	                local charModel = obj:FindFirstAncestorOfClass("Model")
-	                local isCharacter = charModel and charModel:FindFirstChildOfClass("Humanoid")
-	
-	                if isCharacter then
-	                    if obj.Name == "HumanoidRootPart" then
-	                        obj.Transparency = 1
-	                    else
-	                        obj.Transparency = 0
-	                    end
-	                else
-	                    obj.Transparency = state and 0.8 or 0
-	                end
-	            end
-	        end
-	    end
+			for _, obj in pairs(workspace:GetDescendants()) do
+				if obj:IsA("BasePart") then
+					local charModel = obj:FindFirstAncestorOfClass("Model")
+					local isCharacter = charModel and charModel:FindFirstChildOfClass("Humanoid")
+
+					if isCharacter then
+						if obj.Name == "HumanoidRootPart" then
+							obj.Transparency = 1
+						else
+							obj.Transparency = 0
+						end
+					else
+						obj.Transparency = state and 0.8 or 0
+					end
+				end
+			end
+		end
 	})
-	
+
 	local espFolder = {}
 	local espConnection
-	
+
 	ui:AddToggle({
 		Text = "ESP & Tracers",
 		Default = false,
@@ -288,18 +288,18 @@ function init()
 					espFolder[player] = nil
 				end
 			end
-	
+
 			local function createESP(targetPlayer)
 				if targetPlayer == game.Players.LocalPlayer then return end
-				removeESP(targetPlayer) -- Clean up before creating new
-	
+				removeESP(targetPlayer)
+
 				local function setup(character)
 					local head = character:WaitForChild("Head", 10)
 					local root = character:WaitForChild("HumanoidRootPart", 10)
 					if not head or not root then return end
-	
+
 					local teamColor = targetPlayer.TeamColor.Color
-					
+
 					local billboard = Instance.new("BillboardGui")
 					billboard.Name = "p_esp"
 					billboard.Size = UDim2.new(0, 200, 0, 70)
@@ -307,7 +307,7 @@ function init()
 					billboard.AlwaysOnTop = true
 					billboard.Adornee = head
 					billboard.Parent = head
-	
+
 					local textLabel = Instance.new("TextLabel")
 					textLabel.Size = UDim2.new(1, 0, 1, 0)
 					textLabel.BackgroundTransparency = 1
@@ -317,19 +317,19 @@ function init()
 					textLabel.Font = Enum.Font.GothamBold
 					textLabel.Text = targetPlayer.DisplayName
 					textLabel.Parent = billboard
-	
+
 					local highlight = Instance.new("Highlight")
 					highlight.Adornee = character
 					highlight.FillTransparency = 1
 					highlight.OutlineColor = teamColor
 					highlight.Parent = character
-	
+
 					local tracer = Drawing.new("Line")
 					tracer.Visible = false
 					tracer.Color = teamColor
 					tracer.Thickness = 1
 					tracer.Transparency = 1
-	
+
 					espFolder[targetPlayer] = {
 						Gui = billboard,
 						Label = textLabel,
@@ -338,924 +338,924 @@ function init()
 						CharConn = nil -- Placeholder
 					}
 				end
-	
+
 				if targetPlayer.Character then task.spawn(setup, targetPlayer.Character) end
 				local conn = targetPlayer.CharacterAdded:Connect(function(char)
 					task.spawn(setup, char)
 				end)
-				
+
 				if not espFolder[targetPlayer] then espFolder[targetPlayer] = {} end
 				espFolder[targetPlayer].CharConn = conn
 			end
-	
+
 			if state then
 				for _, p in ipairs(plrs:GetPlayers()) do
 					createESP(p)
 				end
-	
+
 				espFolder.AddedConn = game.Players.PlayerAdded:Connect(createESP)
 				espFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeESP)
-	
+
 				espConnection = game:GetService("RunService").RenderStepped:Connect(function()
 					local camera = workspace.CurrentCamera
 					local myChar = game.Players.LocalPlayer.Character
 					local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
 					local screenBottom = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
-	
-					for player, data in pairsFolder) do
-						if typeof(player) == "Instance" and player:IsA("Player") then
-							local char = player.Character
-							local root = char and char:FindFirstChild("HumanoidRootPart")
-	
-							if char and root and data.Tracer then
-								local pos, onScreen = camera:WorldToViewportPoint(root.Position)
-								
-								if onScreen then
-									data.Tracer.From = screenBottom
-									data.Tracer.To = Vector2.new(pos.X, pos.Y)
-									data.Tracer.Visible = true
-								else
-									data.Tracer.Visible = false
-								end
-	
-								if myRoot then
-									local dist = math.floor((myRoot.Position - root.Position).Magnitude)
-									data.Label.Text = string.format("%s\n[%d studs]", player.DisplayName, dist)
-								else
-									data.Label.Text = player.DisplayName
-								end
-							elseif data.Tracer then
+
+					for player, data in pairs(espFolder) do
+					if typeof(player) == "Instance" and player:IsA("Player") then
+						local char = player.Character
+						local root = char and char:FindFirstChild("HumanoidRootPart")
+
+						if char and root and data.Tracer then
+							local pos, onScreen = camera:WorldToViewportPoint(root.Position)
+
+							if onScreen then
+								data.Tracer.From = screenBottom
+								data.Tracer.To = Vector2.new(pos.X, pos.Y)
+								data.Tracer.Visible = true
+							else
 								data.Tracer.Visible = false
 							end
-						end
-					end
-				end)
-			else
-				if espConnection then espConnection:Disconnect() espConnection = nil end
-				if espFolder.AddedConn then espFolder.AddedConn:Disconnect() end
-				if espFolder.RemovedConn then espFolder.RemovedConn:Disconnect() end
-	
-				for player, _ in pairs(espFolder) do
-					if typeof(player) == "Instance" and player:IsA("Player") then
-						removeESP(player)
-					end
-				end
-			end
-		end
-	})
-	
-	local hitboxFolder = {}
-	local hitboxConnection
-	local originalSizes = {}
-	local hbExpanderValue = 0
-	local hitboxEnabled = false
-	
-	ui:AddToggle({
-		Text = "Hitbox Shower",
-		Default = false,
-		Callback = function(state)
-			hitboxEnabled = state
-			
-			local function removeHitbox(player)
-				if hitboxFolder[player] then
-					if hitboxFolder[player].Box then hitboxFolder[player].Box:Destroy() end
-					if hitboxFolder[player].CharConn then hitboxFolder[player].CharConn:Disconnect() end
-					
-					local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-					if root and originalSizes[player] then
-						root.Size = originalSizes[player]
-					end
-					
-					hitboxFolder[player] = nil
-				end
-			end
-	
-			local function createHitbox(player)
-				if player == game.Players.LocalPlayer then return end
-				removeHitbox(player)
-	
-				local function setup(character)
-					local root = character:WaitForChild("HumanoidRootPart", 10)
-					if not root then return end
-					
-					if not originalSizes[player] then
-						originalSizes[player] = root.Size
-					end
-	
-					local adornment = Instance.new("BoxHandleAdornment")
-					adornment.Name = "HitboxView"
-					adornment.Adornee = root
-					adornment.AlwaysOnTop = true
-					adornment.ZIndex = 10
-					adornment.Transparency = 0.5
-					adornment.Color3 = player.TeamColor.Color
-					adornment.Size = root.Size
-					adornment.Parent = root
-	
-					hitboxFolder[player] = {
-						Box = adornment,
-						Part = root,
-						CharConn = hitboxFolder[player] and hitboxFolder[player].CharConn
-					}
-				end
-	
-				if player.Character then task.spawn(setup, player.Character) end
-				local conn = player.CharacterAdded:Connect(setup)
-				
-				hitboxFolder[player] = { CharConn = conn }
-			end
-	
-			if state then
-				for _, p in ipairs(game.Players:GetPlayers()) do
-					createHitbox(p)
-				end
-	
-				hitboxFolder.AddedConn = game.Players.PlayerAdded:Connect(createHitbox)
-				hitboxFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeHitbox)
-	
-				hitboxConnection = game:GetService("RunService").RenderStepped:Connect(function()
-					for player, data in pairs(hitboxFolder) do
-						if typeof(player) == "Instance" and player:IsA("Player") then
-							if data.Box and data.Part and data.Part.Parent then
-								data.Box.Color3 = player.TeamColor.Color
-								data.Box.Size = data.Part.Size
+
+							if myRoot then
+								local dist = math.floor((myRoot.Position - root.Position).Magnitude)
+								data.Label.Text = string.format("%s\n[%d studs]", player.DisplayName, dist)
+							else
+								data.Label.Text = player.DisplayName
 							end
+						elseif data.Tracer then
+							data.Tracer.Visible = false
 						end
 					end
-				end)
-			else
-				if hitboxConnection then hitboxConnection:Disconnect() hitboxConnection = nil end
-				if hitboxFolder.AddedConn then hitboxFolder.AddedConn:Disconnect() end
-				if hitboxFolder.RemovedConn then hitboxFolder.RemovedConn:Disconnect() end
-	
-				for player, _ in pairs(hitboxFolder) do
-					if typeof(player) == "Instance" and player:IsA("Player") then
-						removeHitbox(player)
-					end
 				end
+			end)
+	else
+	if espConnection then espConnection:Disconnect() espConnection = nil end
+	if espFolder.AddedConn then espFolder.AddedConn:Disconnect() end
+	if espFolder.RemovedConn then espFolder.RemovedConn:Disconnect() end
+
+	for player, _ in pairs(espFolder) do
+		if typeof(player) == "Instance" and player:IsA("Player") then
+			removeESP(player)
+		end
+	end
+end
+end
+})
+
+local hitboxFolder = {}
+local hitboxConnection
+local originalSizes = {}
+local hbExpanderValue = 0
+local hitboxEnabled = false
+
+ui:AddToggle({
+	Text = "Hitbox Shower",
+	Default = false,
+	Callback = function(state)
+		hitboxEnabled = state
+
+		local function removeHitbox(player)
+			if hitboxFolder[player] then
+				if hitboxFolder[player].Box then hitboxFolder[player].Box:Destroy() end
+				if hitboxFolder[player].CharConn then hitboxFolder[player].CharConn:Disconnect() end
+
+				local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				if root and originalSizes[player] then
+					root.Size = originalSizes[player]
+				end
+
+				hitboxFolder[player] = nil
 			end
 		end
-	})
-	
-	local function applyHitbox(player)
-		if player == game.Players.LocalPlayer then return end
-		local character = player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-	
-		if root then
-			if not originalSizes[player] then
-				originalSizes[player] = root.Size
+
+		local function createHitbox(player)
+			if player == game.Players.LocalPlayer then return end
+			removeHitbox(player)
+
+			local function setup(character)
+				local root = character:WaitForChild("HumanoidRootPart", 10)
+				if not root then return end
+
+				if not originalSizes[player] then
+					originalSizes[player] = root.Size
+				end
+
+				local adornment = Instance.new("BoxHandleAdornment")
+				adornment.Name = "HitboxView"
+				adornment.Adornee = root
+				adornment.AlwaysOnTop = true
+				adornment.ZIndex = 10
+				adornment.Transparency = 0.5
+				adornment.Color3 = player.TeamColor.Color
+				adornment.Size = root.Size
+				adornment.Parent = root
+
+				hitboxFolder[player] = {
+					Box = adornment,
+					Part = root,
+					CharConn = hitboxFolder[player] and hitboxFolder[player].CharConn
+				}
 			end
-	
-			if hitboxEnabled and hbExpanderValue > 0 then
-				root.Size = Vector3.new(hbExpanderValue, hbExpanderValue, hbExpanderValue)
-				root.CanCollide = false
-			else
-				root.Size = originalSizes[player] or Vector3.new(2, 2, 1)
+
+			if player.Character then task.spawn(setup, player.Character) end
+			local conn = player.CharacterAdded:Connect(setup)
+
+			hitboxFolder[player] = { CharConn = conn }
+		end
+
+		if state then
+			for _, p in ipairs(game.Players:GetPlayers()) do
+				createHitbox(p)
+			end
+
+			hitboxFolder.AddedConn = game.Players.PlayerAdded:Connect(createHitbox)
+			hitboxFolder.RemovedConn = game.Players.PlayerRemoving:Connect(removeHitbox)
+
+			hitboxConnection = game:GetService("RunService").RenderStepped:Connect(function()
+				for player, data in pairs(hitboxFolder) do
+					if typeof(player) == "Instance" and player:IsA("Player") then
+						if data.Box and data.Part and data.Part.Parent then
+							data.Box.Color3 = player.TeamColor.Color
+							data.Box.Size = data.Part.Size
+						end
+					end
+				end
+			end)
+		else
+			if hitboxConnection then hitboxConnection:Disconnect() hitboxConnection = nil end
+			if hitboxFolder.AddedConn then hitboxFolder.AddedConn:Disconnect() end
+			if hitboxFolder.RemovedConn then hitboxFolder.RemovedConn:Disconnect() end
+
+			for player, _ in pairs(hitboxFolder) do
+				if typeof(player) == "Instance" and player:IsA("Player") then
+					removeHitbox(player)
+				end
 			end
 		end
 	end
-	
-	game:GetService("RunService").Heartbeat:Connect(function()
-		for _, p in ipairs(game.Players:GetPlayers()) do
+})
+
+local function applyHitbox(player)
+	if player == game.Players.LocalPlayer then return end
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+
+	if root then
+		if not originalSizes[player] then
+			originalSizes[player] = root.Size
+		end
+
+		if hitboxEnabled and hbExpanderValue > 0 then
+			root.Size = Vector3.new(hbExpanderValue, hbExpanderValue, hbExpanderValue)
+			root.CanCollide = false
+		else
+			root.Size = originalSizes[player] or Vector3.new(2, 2, 1)
+		end
+	end
+end
+
+game:GetService("RunService").Heartbeat:Connect(function()
+	for _, p in ipairs(game.Players:GetPlayers()) do
+		applyHitbox(p)
+	end
+end)
+
+ui:AddSlider({
+	Text = "Hitbox Expander",
+	Default = 0,
+	Min = 0,
+	Max = 100,
+	Callback = function(num)
+		hbExpanderValue = num
+		for _, p in ipairs(plrs:GetPlayers()) do
 			applyHitbox(p)
 		end
-	end)
+	end,
+})
 
-	ui:AddSlider({
-		Text = "Hitbox Expander",
-		Default = 0,
-		Min = 0,
-		Max = 100,
-		Callback = function(num)
-			hbExpanderValue = num
-			for _, p in ipairs(plrs:GetPlayers()) do
+RS.RenderStepped:Connect(function()
+	if hbExpanderValue > 0 then
+		for _, p in ipairs(plrs:GetPlayers()) do
+			local char = p.Character
+			local root = char and char:FindFirstChild("HumanoidRootPart")
+			if root and root.Size.X ~= hbExpanderValue then
 				applyHitbox(p)
 			end
-		end,
-	})
-
-	RS.RenderStepped:Connect(function()
-		if hbExpanderValue > 0 then
-			for _, p in ipairs(plrs:GetPlayers()) do
-				local char = p.Character
-				local root = char and char:FindFirstChild("HumanoidRootPart")
-				if root and root.Size.X ~= hbExpanderValue then
-					applyHitbox(p)
-				end
-			end
 		end
-	end)
-	
-	local aimconn = nil
-	
-	ui:AddToggle({
-		Text = "Aimbot",
-		Default = false,
+	end
+end)
 
-		Callback = function(state)
-			if state then
-				local function getNearestPlayer(originPosition)
-					local closestPlayer = nil
-					local shortestDistance = math.huge
+local aimconn = nil
 
-					for _, player in ipairs(plrs:GetPlayers()) do
-						if player ~= plr then
-							local character = player.Character
-							if character and character:FindFirstChild("HumanoidRootPart") then
-								local distance = (character.HumanoidRootPart.Position - originPosition).Magnitude
-								if distance < shortestDistance then
-									shortestDistance = distance
-									closestPlayer = player
-								end
+ui:AddToggle({
+	Text = "Aimbot",
+	Default = false,
+
+	Callback = function(state)
+		if state then
+			local function getNearestPlayer(originPosition)
+				local closestPlayer = nil
+				local shortestDistance = math.huge
+
+				for _, player in ipairs(plrs:GetPlayers()) do
+					if player ~= plr then
+						local character = player.Character
+						if character and character:FindFirstChild("HumanoidRootPart") then
+							local distance = (character.HumanoidRootPart.Position - originPosition).Magnitude
+							if distance < shortestDistance then
+								shortestDistance = distance
+								closestPlayer = player
 							end
 						end
 					end
-
-					return closestPlayer
 				end
 
-				local function faceTarget(target)
-					if target and character and character.HumanoidRootPart then
-						local charHRP = character.HumanoidRootPart
-						local dir = (target.HumanoidRootPart.Position - charHRP.Position).Unit
-						dir = Vector3.new(dir.X, 0, dir.Z)
-						charHRP.CFrame = CFrame.new(charHRP.Position, charHRP.Position + dir)
+				return closestPlayer
+			end
+
+			local function faceTarget(target)
+				if target and character and character.HumanoidRootPart then
+					local charHRP = character.HumanoidRootPart
+					local dir = (target.HumanoidRootPart.Position - charHRP.Position).Unit
+					dir = Vector3.new(dir.X, 0, dir.Z)
+					charHRP.CFrame = CFrame.new(charHRP.Position, charHRP.Position + dir)
+				end
+			end
+
+			local hrp = character:FindFirstChild("HumanoidRootPart")
+			local target = getNearestPlayer(hrp.Position)		
+
+			if target then
+				aimconn = RS.RenderStepped:Connect(function()
+					local targetchar = target.Character
+					local targetPos = targetchar.HumanoidRootPart.Position
+					local camPos = hrp.Position
+					camera.CFrame = CFrame.new(camPos, targetPos)
+					faceTarget(targetchar)
+				end)
+			else
+				ui:Notify({
+					Title = "Error",
+					Text = "Player not found!",
+					Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
+				})
+			end
+		else
+			if aimconn then
+				aimconn:Disconnect()
+				aimconn = nil
+			end
+		end
+	end,
+})
+
+ui:AddTextBox({
+	Text = "Go to:",
+	Default = "",
+	Placeholder = "Player Name or 'random'",
+
+	Callback = function(text)
+		if text == "" then return end
+
+		text = text:lower()
+		local playersList = plrs:GetPlayers()
+		local target = nil
+
+		if text == "random" then
+			if #playersList > 1 then
+				local others = {}
+				for _, p in ipairs(playersList) do
+					if p ~= plr then table.insert(others, p) end
+				end
+				target = others[math.random(1, #others)]
+			else
+				target = playersList[1]
+			end
+		end
+
+		if not target then
+			for _, plr in ipairs(playersList) do
+				if plr.Name:lower() == text or plr.DisplayName:lower() == text then
+					target = plr
+					break
+				end
+			end
+		end
+
+		if not target then
+			local bestScore = 0
+			for _, plr in ipairs(playersList) do
+				local nameLower = plr.Name:lower()
+				local displayLower = plr.DisplayName:lower()
+
+				local function getMatchScore(targetName)
+					local score = 0
+					for i = 1, math.min(#text, #targetName) do
+						if text:sub(i, i) == targetName:sub(i, i) then
+							score += 1
+						else
+							break
+						end
+					end
+					return score
+				end
+
+				local score = math.max(getMatchScore(nameLower), getMatchScore(displayLower))
+
+				if score > bestScore then
+					bestScore = score
+					target = plr
+				end
+			end
+		end
+
+		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+			character:PivotTo(target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3))
+		else
+			ui:Notify({
+				Title = "Error",
+				Text = "Player not found or has no character",
+				Duration = 3,
+				StartPosition = UDim2.new(1, 0, 0.776, 0),
+				EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+				TweenTime = 0.5
+			})
+		end
+	end
+})
+
+ui:AddSeparator()
+
+ui:AddSection("Character")
+
+ui:AddSlider({
+	Text = "WalkSpeed",
+	Default = 16,
+	Min = 0,
+	Max = 200,
+	Callback = function(num)
+		hum.WalkSpeed = num
+	end,
+})
+
+ui:AddSlider({
+	Text = "JumpPower",
+	Default = 16,
+	Min = 0,
+	Max = 200,
+	Callback = function(num)
+		hum.JumpPower = num
+	end,
+})
+
+local speed = 0
+
+ui:AddTextBox({
+	Text = "Fly Speed",
+	Default = "0",
+	Placeholder = "0",
+	Callback = function(text)
+		local num = tonumber(text)
+		if num then
+			speed = num
+		end
+	end,
+})
+
+local flyConnection
+local att, lv, ao
+
+ui:AddToggle({
+	Text = "Fly",
+	Default = false,
+	Callback = function(state)
+		if flyConnection then flyConnection:Disconnect() flyConnection = nil end
+		if att then att:Destroy() att = nil end
+		if lv then lv:Destroy() lv = nil end
+		if ao then ao:Destroy() ao = nil end
+
+		local root = hum.RootPart
+
+		if not root or not hum then return end
+
+		if state then
+			hum.PlatformStand = true 
+
+			att = Instance.new("Attachment")
+			att.Name = "FlyAtt"
+			att.Position = Vector3.zero
+			att.Parent = root
+
+			lv = Instance.new("LinearVelocity")
+			lv.Attachment0 = att
+			lv.MaxForce = math.huge
+			lv.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+			lv.RelativeTo = Enum.ActuatorRelativeTo.World
+			lv.Parent = root
+
+			ao = Instance.new("AlignOrientation")
+			ao.Attachment0 = att
+			ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
+			ao.RigidityEnabled = true 
+			ao.Parent = root
+
+			flyConnection = game:GetService("RunService").RenderStepped:Connect(function()
+				if not root or not hum then return end
+
+				local moveDir = hum.MoveDirection
+				local camCF = camera.CFrame
+
+				if moveDir.Magnitude > 0 then
+					local lateralMove = camCF:VectorToObjectSpace(moveDir)
+					lv.VectorVelocity = camCF:VectorToWorldSpace(Vector3.new(lateralMove.X, 0, lateralMove.Z)) * speed
+				else
+					lv.VectorVelocity = Vector3.zero
+				end
+
+				ao.CFrame = camCF
+			end)
+		else
+			if hum then
+				hum.PlatformStand = false
+				hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+			end
+		end
+	end,
+})
+
+local noclipRadius = 10
+
+ui:AddTextBox({
+	Text = "Noclip Radius",
+	Default = "0",
+	Placeholder = "0",
+	Callback = function(text)
+		local num = tonumber(text)
+		if num then
+			noclipRadius = num
+		end
+	end,
+})
+
+local noclipConnection
+local affectedParts = {}
+
+ui:AddToggle({
+	Text = "Noclip",
+	Default = false,
+	Callback = function(state)
+		if state then
+			noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+				local root = hum.RootPart
+				if not character or not root then return end
+
+				local params = RaycastParams.new()
+				params.FilterDescendantsInstances = {character}
+				params.FilterType = Enum.RaycastFilterType.Exclude
+				local ray = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), params)
+				local ground = ray and ray.Instance
+
+				for _, v in pairs(character:GetDescendants()) do
+					if v:IsA("BasePart") then
+						v.CanCollide = false
 					end
 				end
-				
-				local hrp = character:FindFirstChild("HumanoidRootPart")
-				local target = getNearestPlayer(hrp.Position)		
 
-				if target then
-					aimconn = RS.RenderStepped:Connect(function()
-						local targetchar = target.Character
-						local targetPos = targetchar.HumanoidRootPart.Position
-						local camPos = hrp.Position
-						camera.CFrame = CFrame.new(camPos, targetPos)
-						faceTarget(targetchar)
-					end)
+				local nearby = workspace:GetPartBoundsInRadius(root.Position, noclipRadius)
+				local currentFrameParts = {}
+
+				for _, part in pairs(nearby) do
+					if part:IsA("BasePart") and part ~= ground and not part:IsDescendantOf(character) then
+						local relativeDiff = part.Position.Y - (root.Position.Y - 2.5)
+
+						if relativeDiff > 0.5 then
+							if affectedParts[part] == nil then
+								affectedParts[part] = part.CanCollide
+							end
+							part.CanCollide = false
+							currentFrameParts[part] = true
+						end
+					end
+				end
+
+				for part, _ in pairs(affectedParts) do
+					if not currentFrameParts[part] then
+						part.CanCollide = affectedParts[part]
+						affectedParts[part] = nil
+					end
+				end
+			end)
+		else
+			if noclipConnection then 
+				noclipConnection:Disconnect() 
+				noclipConnection = nil 
+			end
+
+			for part, originalValue in pairs(affectedParts) do
+				if part and part.Parent then
+					part.CanCollide = originalValue
+				end
+			end
+
+			table.clear(affectedParts)
+
+			if character then
+				for _, v in pairs(character:GetDescendants()) do
+					if v:IsA("BasePart") then
+						v.CanCollide = true
+					end
+				end
+			end
+		end
+	end
+})
+
+local infJumpConnection = nil
+
+ui:AddToggle({
+	Text = "Infinite Jump",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			infJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+				local character = game.Players.LocalPlayer.Character
+				if character then
+					local hum = character:FindFirstChildOfClass("Humanoid")
+					if hum then
+						hum:ChangeState(Enum.HumanoidStateType.Jumping)
+					end
+				end
+			end)
+		else
+			if infJumpConnection then
+				infJumpConnection:Disconnect()
+				infJumpConnection = nil
+			end
+		end
+	end
+})
+
+ui:AddSeparator()
+
+ui:AddSection("Admin")
+
+ui:AddButton({
+	Text = "Infinite Yield",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+	end,
+})
+
+ui:AddButton({
+	Text = "Namless Admin (Reworked, use at own risk)",
+	TextSize = 6,
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/Nameless-Admin/main/Source.lua"))()
+	end,
+})
+
+ui:AddButton({
+	Text = "Namless Admin (Orginal)",
+	TextSize = 10,
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()
+	end,
+})
+
+ui:AddButton({
+	Text = "Fedora Admin",
+
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/alexx1212/fedoratoomutch/main/toomucth'))()
+	end,
+})
+
+ui:AddButton({
+	Text = "Cmd X",
+
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source", true))()
+	end,
+})
+
+ui:AddSeparator()
+
+ui:AddSection("Trolling")
+
+local flingPowerValue = 0
+
+ui:AddTextBox({
+	Text = "Fling Power",
+	Default = "0",
+	Placeholder = "0",
+	Callback = function(text)
+		local num = tonumber(text)
+		if num then
+			flingPowerValue = num
+		end
+	end,
+})
+
+local flingAV
+local flingatt
+local flinggyro
+local flingconn
+
+ui:AddToggle({
+	Text = "Fling",
+	Default = false,
+	Callback = function(state)
+		local char = game.Players.LocalPlayer.Character
+		local root = char and char:FindFirstChild("HumanoidRootPart")
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+		if not root or not hum then return end
+
+		if state then
+			flingatt = Instance.new("Attachment", root)
+			flingatt.Name = "FlingAttachment"
+
+			flingAV = Instance.new("AngularVelocity", root)
+			flingAV.Attachment0 = flingatt
+			flingAV.MaxTorque = math.huge
+			flingAV.AngularVelocity = Vector3.new(0, flingPowerValue, 0)
+
+			flinggyro = Instance.new("BodyGyro", root)
+			flinggyro.P = 3000
+			flinggyro.MaxTorque = Vector3.new(math.huge, 0, math.huge)
+			flinggyro.CFrame = root.CFrame
+
+			hum.AutoRotate = false
+
+			flingconn = game:GetService("RunService").PostSimulation:Connect(function()
+				hum.PlatformStand = false
+				hum:ChangeState(Enum.HumanoidStateType.Running)
+
+				if hum.MoveDirection.Magnitude > 0 then
+					root.Velocity = hum.MoveDirection * hum.WalkSpeed + Vector3.new(0, root.Velocity.Y, 0)
+				end
+
+				root.RotVelocity = Vector3.new(0, root.RotVelocity.Y, 0)
+			end)
+		else
+			if flingAV then flingAV:Destroy() end
+			if flingatt then flingatt:Destroy() end
+			if flinggyro then flinggyro:Destroy() end
+			if flingconn then flingconn:Disconnect() end
+
+			hum.AutoRotate = true
+			hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end
+	end,
+})
+
+local SKY_HEIGHT = 700
+
+ui:AddTextBox({
+	Text = "Sky Height",
+	Default = "700",
+	Placeholder = "0",
+	Callback = function(text)
+		local num = tonumber(text)
+		if num then
+			SKY_HEIGHT = num
+		end
+	end,
+})
+
+local storedPos
+local invisConn
+local ghost
+
+ui:AddToggle({
+	Text = "Invisiblity",
+	Default = false,
+	Callback = function(state)
+		if state then
+			local realChar = character
+			local hrp = hum.RootPart
+			character.Archivable = true
+			storedPos = hrp.CFrame
+
+			invisConn = RS.RenderStepped:Connect(function()
+				hrp.CFrame = storedPos * CFrame.new(0, SKY_HEIGHT, 0)
+			end)
+
+			ghost = realChar:Clone()
+			ghost.Parent = workspace
+
+			for _, part in ipairs(ghost:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.Anchored = false
+					part.CanCollide = true
+					part.Transparency = 0.8
+				end
+			end
+
+			ghost:WaitForChild("HumanoidRootPart").CFrame = storedPos
+
+			camera.CameraSubject = ghost:WaitForChild("Humanoid")
+			plr.Character = ghost
+		else
+			if ghost then
+				local realChar = plr.Character.Parent:FindFirstChild(plr.Name) or character
+
+				invisConn:Disconnect()
+				invisConn = nil
+
+				if realChar then
+					realChar:PivotTo(ghost.HumanoidRootPart.CFrame)
+				end
+
+				ghost:Destroy()
+				ghost = nil
+			end
+
+			plr.Character = character
+			camera.CameraSubject = character:WaitForChild("Humanoid")
+		end
+	end,
+})
+
+ui:AddSeparator()
+
+ui:AddSection("Server")
+
+ui:AddButton({
+	Text = "Open Server List",
+	Callback = function()
+		initServerList()
+	end,
+})
+
+ui:AddButton({
+	Text = "Join Smallest Server",
+	Callback = function()
+		local _place = game.PlaceId
+		local _currentServer = game.JobId
+		local _apiURL = Api .. _place .. "/servers/Public?sortOrder=Asc&limit=100"
+
+		local function ListServers(cursor)
+			local success, Raw = pcall(function()
+				return game:HttpGet(_apiURL .. ((cursor and "&cursor="..cursor) or ""))
+			end)
+
+			if success then
+				return Http:JSONDecode(Raw)
+			end
+			return nil
+		end
+
+		local NextCursor = nil
+		local targetServer = nil
+
+		for i = 1, 5 do 
+			local Servers = ListServers(NextCursor)
+
+			if Servers and Servers.data then
+				for _, server in pairs(Servers.data) do
+					if server.id ~= _currentServer and server.playing < server.maxPlayers then
+						targetServer = server
+						break
+					end
+				end
+			end
+
+			if targetServer then break end
+
+			if Servers and Servers.nextPageCursor then
+				NextCursor = Servers.nextPageCursor
+			else
+				break
+			end
+		end
+
+		if targetServer then
+			TPS:TeleportToPlaceInstance(_place, targetServer.id, plr)
+		else
+			ui:Notify({
+				Title = "Server Failure",
+				Text = "Couldnt find a different smallest server.",
+				Duration = 3,
+				StartPosition = UDim2.new(1, 0, 0.776, 0),
+				EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+				TweenTime = 0.5
+			})
+		end
+	end,
+})
+
+ui:AddButton({
+	Text = "Server Hop",
+	Callback = function()
+		local HttpService = game:GetService("HttpService")
+
+		local PlaceId = game.PlaceId
+		local JobId = game.JobId
+		local Api = "https://games.roproxy.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
+
+		local success, result = pcall(function()
+			return game:HttpGet(Api) 
+		end)
+
+		if success then
+			local decoded = HttpService:JSONDecode(result)
+			if decoded and decoded.data then
+				local possibleServers = {}
+
+				for _, server in pairs(decoded.data) do
+					if server.id ~= JobId and server.playing < server.maxPlayers then
+						table.insert(possibleServers, server.id)
+					end
+				end
+
+				if #possibleServers > 0 then
+					local randomId = possibleServers[math.random(1, #possibleServers)]
+					TPS:TeleportToPlaceInstance(PlaceId, randomId, game.Players.LocalPlayer)
 				else
 					ui:Notify({
-						Title = "Error",
-						Text = "Player not found!",
+						Title = "Server Failure",
+						Text = "No other servers found to hop to.",
 						Duration = 3,
 						StartPosition = UDim2.new(1, 0, 0.776, 0),
 						EndPosition = UDim2.new(0.724, 0, 0.776, 0),
 						TweenTime = 0.5
 					})
 				end
-			else
-				if aimconn then
-					aimconn:Disconnect()
-					aimconn = nil
-				end
 			end
-		end,
-	})
-	
-	ui:AddTextBox({
-		Text = "Go to:",
-		Default = "",
-		Placeholder = "Player Name or 'random'",
-
-		Callback = function(text)
-			if text == "" then return end
-
-			text = text:lower()
-			local playersList = plrs:GetPlayers()
-			local target = nil
-
-			if text == "random" then
-				if #playersList > 1 then
-					local others = {}
-					for _, p in ipairs(playersList) do
-						if p ~= plr then table.insert(others, p) end
-					end
-					target = others[math.random(1, #others)]
-				else
-					target = playersList[1]
-				end
-			end
-
-			if not target then
-				for _, plr in ipairs(playersList) do
-					if plr.Name:lower() == text or plr.DisplayName:lower() == text then
-						target = plr
-						break
-					end
-				end
-			end
-
-			if not target then
-				local bestScore = 0
-				for _, plr in ipairs(playersList) do
-					local nameLower = plr.Name:lower()
-					local displayLower = plr.DisplayName:lower()
-
-					local function getMatchScore(targetName)
-						local score = 0
-						for i = 1, math.min(#text, #targetName) do
-							if text:sub(i, i) == targetName:sub(i, i) then
-								score += 1
-							else
-								break
-							end
-						end
-						return score
-					end
-
-					local score = math.max(getMatchScore(nameLower), getMatchScore(displayLower))
-
-					if score > bestScore then
-						bestScore = score
-						target = plr
-					end
-				end
-			end
-
-			if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-				character:PivotTo(target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3))
-			else
-				ui:Notify({
-					Title = "Error",
-					Text = "Player not found or has no character",
-					Duration = 3,
-					StartPosition = UDim2.new(1, 0, 0.776, 0),
-					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-					TweenTime = 0.5
-				})
-			end
+		else
+			ui:Notify({
+				Title = "Server Failure",
+				Text = "Failed to fetch server list: " .. tostring(result),
+				Duration = 3,
+				StartPosition = UDim2.new(1, 0, 0.776, 0),
+				EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+				TweenTime = 0.5
+			})
 		end
-	})
-	
-	ui:AddSeparator()
-	
-	ui:AddSection("Character")
-	
-	ui:AddSlider({
-		Text = "WalkSpeed",
-		Default = 16,
-		Min = 0,
-		Max = 200,
-		Callback = function(num)
-			hum.WalkSpeed = num
-		end,
-	})
-
-	ui:AddSlider({
-		Text = "JumpPower",
-		Default = 16,
-		Min = 0,
-		Max = 200,
-		Callback = function(num)
-			hum.JumpPower = num
-		end,
-	})
-	
-	local speed = 0
-	
-	ui:AddTextBox({
-		Text = "Fly Speed",
-		Default = "0",
-		Placeholder = "0",
-		Callback = function(text)
-			local num = tonumber(text)
-			if num then
-				speed = num
-			end
-		end,
-	})
-
-	local flyConnection
-	local att, lv, ao
-
-	ui:AddToggle({
-		Text = "Fly",
-		Default = false,
-		Callback = function(state)
-			if flyConnection then flyConnection:Disconnect() flyConnection = nil end
-			if att then att:Destroy() att = nil end
-			if lv then lv:Destroy() lv = nil end
-			if ao then ao:Destroy() ao = nil end
-
-			local root = hum.RootPart
-
-			if not root or not hum then return end
-
-			if state then
-				hum.PlatformStand = true 
-
-				att = Instance.new("Attachment")
-				att.Name = "FlyAtt"
-				att.Position = Vector3.zero
-				att.Parent = root
-
-				lv = Instance.new("LinearVelocity")
-				lv.Attachment0 = att
-				lv.MaxForce = math.huge
-				lv.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
-				lv.RelativeTo = Enum.ActuatorRelativeTo.World
-				lv.Parent = root
-
-				ao = Instance.new("AlignOrientation")
-				ao.Attachment0 = att
-				ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
-				ao.RigidityEnabled = true 
-				ao.Parent = root
-
-				flyConnection = game:GetService("RunService").RenderStepped:Connect(function()
-					if not root or not hum then return end
-
-					local moveDir = hum.MoveDirection
-					local camCF = camera.CFrame
-
-					if moveDir.Magnitude > 0 then
-						local lateralMove = camCF:VectorToObjectSpace(moveDir)
-						lv.VectorVelocity = camCF:VectorToWorldSpace(Vector3.new(lateralMove.X, 0, lateralMove.Z)) * speed
-					else
-						lv.VectorVelocity = Vector3.zero
-					end
-
-					ao.CFrame = camCF
-				end)
-			else
-				if hum then
-					hum.PlatformStand = false
-					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-				end
-			end
-		end,
-	})
-	
-	local noclipRadius = 10
-	
-	ui:AddTextBox({
-		Text = "Noclip Radius",
-		Default = "0",
-		Placeholder = "0",
-		Callback = function(text)
-			local num = tonumber(text)
-			if num then
-				noclipRadius = num
-			end
-		end,
-	})
-
-	local noclipConnection
-	local affectedParts = {}
-
-	ui:AddToggle({
-		Text = "Noclip",
-		Default = false,
-		Callback = function(state)
-			if state then
-				noclipConnection = game:GetService("RunService").Stepped:Connect(function()
-					local root = hum.RootPart
-					if not character or not root then return end
-
-					local params = RaycastParams.new()
-					params.FilterDescendantsInstances = {character}
-					params.FilterType = Enum.RaycastFilterType.Exclude
-					local ray = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), params)
-					local ground = ray and ray.Instance
-
-					for _, v in pairs(character:GetDescendants()) do
-						if v:IsA("BasePart") then
-							v.CanCollide = false
-						end
-					end
-
-					local nearby = workspace:GetPartBoundsInRadius(root.Position, noclipRadius)
-					local currentFrameParts = {}
-
-					for _, part in pairs(nearby) do
-						if part:IsA("BasePart") and part ~= ground and not part:IsDescendantOf(character) then
-							local relativeDiff = part.Position.Y - (root.Position.Y - 2.5)
-
-							if relativeDiff > 0.5 then
-								if affectedParts[part] == nil then
-									affectedParts[part] = part.CanCollide
-								end
-								part.CanCollide = false
-								currentFrameParts[part] = true
-							end
-						end
-					end
-
-					for part, _ in pairs(affectedParts) do
-						if not currentFrameParts[part] then
-							part.CanCollide = affectedParts[part]
-							affectedParts[part] = nil
-						end
-					end
-				end)
-			else
-				if noclipConnection then 
-					noclipConnection:Disconnect() 
-					noclipConnection = nil 
-				end
-
-				for part, originalValue in pairs(affectedParts) do
-					if part and part.Parent then
-						part.CanCollide = originalValue
-					end
-				end
-
-				table.clear(affectedParts)
-
-				if character then
-					for _, v in pairs(character:GetDescendants()) do
-						if v:IsA("BasePart") then
-							v.CanCollide = true
-						end
-					end
-				end
-			end
-		end
-	})
-	
-	local infJumpConnection = nil
-
-	ui:AddToggle({
-		Text = "Infinite Jump",
-		Default = false,
-		Callback = function(Value)
-			if Value then
-				infJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
-					local character = game.Players.LocalPlayer.Character
-					if character then
-						local hum = character:FindFirstChildOfClass("Humanoid")
-						if hum then
-							hum:ChangeState(Enum.HumanoidStateType.Jumping)
-						end
-					end
-				end)
-			else
-				if infJumpConnection then
-					infJumpConnection:Disconnect()
-					infJumpConnection = nil
-				end
-			end
-		end
-	})
-	
-	ui:AddSeparator()
-	
-	ui:AddSection("Admin")
-	
-	ui:AddButton({
-		Text = "Infinite Yield",
-		Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Namless Admin (Reworked, use at own risk)",
-		TextSize = 6,
-		Callback = function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/Nameless-Admin/main/Source.lua"))()
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Namless Admin (Orginal)",
-		TextSize = 10,
-		Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Fedora Admin",
-
-		Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/alexx1212/fedoratoomutch/main/toomucth'))()
-		end,
-	})
-
-	ui:AddButton({
-		Text = "Cmd X",
-
-		Callback = function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source", true))()
-		end,
-	})
-	
-	ui:AddSeparator()
-	
-	ui:AddSection("Trolling")
-	
-	local flingPowerValue = 0
-	
-	ui:AddTextBox({
-		Text = "Fling Power",
-		Default = "0",
-		Placeholder = "0",
-		Callback = function(text)
-			local num = tonumber(text)
-			if num then
-				flingPowerValue = num
-			end
-		end,
-	})
-
-	local flingAV
-	local flingatt
-	local flinggyro
-	local flingconn
-
-	ui:AddToggle({
-		Text = "Fling",
-		Default = false,
-		Callback = function(state)
-			local char = game.Players.LocalPlayer.Character
-			local root = char and char:FindFirstChild("HumanoidRootPart")
-			local hum = char and char:FindFirstChildOfClass("Humanoid")
-
-			if not root or not hum then return end
-
-			if state then
-				flingatt = Instance.new("Attachment", root)
-				flingatt.Name = "FlingAttachment"
-
-				flingAV = Instance.new("AngularVelocity", root)
-				flingAV.Attachment0 = flingatt
-				flingAV.MaxTorque = math.huge
-				flingAV.AngularVelocity = Vector3.new(0, flingPowerValue, 0)
-
-				flinggyro = Instance.new("BodyGyro", root)
-				flinggyro.P = 3000
-				flinggyro.MaxTorque = Vector3.new(math.huge, 0, math.huge)
-				flinggyro.CFrame = root.CFrame
-
-				hum.AutoRotate = false
-
-				flingconn = game:GetService("RunService").PostSimulation:Connect(function()
-					hum.PlatformStand = false
-					hum:ChangeState(Enum.HumanoidStateType.Running)
-
-					if hum.MoveDirection.Magnitude > 0 then
-						root.Velocity = hum.MoveDirection * hum.WalkSpeed + Vector3.new(0, root.Velocity.Y, 0)
-					end
-
-					root.RotVelocity = Vector3.new(0, root.RotVelocity.Y, 0)
-				end)
-			else
-				if flingAV then flingAV:Destroy() end
-				if flingatt then flingatt:Destroy() end
-				if flinggyro then flinggyro:Destroy() end
-				if flingconn then flingconn:Disconnect() end
-
-				hum.AutoRotate = true
-				hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-			end
-		end,
-	})
-
-	local SKY_HEIGHT = 700
-	
-	ui:AddTextBox({
-		Text = "Sky Height",
-		Default = "700",
-		Placeholder = "0",
-		Callback = function(text)
-			local num = tonumber(text)
-			if num then
-				SKY_HEIGHT = num
-			end
-		end,
-	})
-	
-	local storedPos
-	local invisConn
-	local ghost
-	
-	ui:AddToggle({
-		Text = "Invisiblity",
-		Default = false,
-		Callback = function(state)
-			if state then
-				local realChar = character
-				local hrp = hum.RootPart
-				character.Archivable = true
-				storedPos = hrp.CFrame
-
-				invisConn = RS.RenderStepped:Connect(function()
-					hrp.CFrame = storedPos * CFrame.new(0, SKY_HEIGHT, 0)
-				end)
-
-				ghost = realChar:Clone()
-				ghost.Parent = workspace
-
-				for _, part in ipairs(ghost:GetDescendants()) do
-					if part:IsA("BasePart") then
-						part.Anchored = false
-						part.CanCollide = true
-						part.Transparency = 0.8
-					end
-				end
-
-				ghost:WaitForChild("HumanoidRootPart").CFrame = storedPos
-
-				camera.CameraSubject = ghost:WaitForChild("Humanoid")
-				plr.Character = ghost
-			else
-				if ghost then
-					local realChar = plr.Character.Parent:FindFirstChild(plr.Name) or character
-
-					invisConn:Disconnect()
-					invisConn = nil
-
-					if realChar then
-						realChar:PivotTo(ghost.HumanoidRootPart.CFrame)
-					end
-
-					ghost:Destroy()
-					ghost = nil
-				end
-
-				plr.Character = character
-				camera.CameraSubject = character:WaitForChild("Humanoid")
-			end
-		end,
-	})
-	
-	ui:AddSeparator()
-	
-	ui:AddSection("Server")
-	
-	ui:AddButton({
-		Text = "Open Server List",
-		Callback = function()
-			initServerList()
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Join Smallest Server",
-		Callback = function()
-			local _place = game.PlaceId
-			local _currentServer = game.JobId
-			local _apiURL = Api .. _place .. "/servers/Public?sortOrder=Asc&limit=100"
-
-			local function ListServers(cursor)
-				local success, Raw = pcall(function()
-					return game:HttpGet(_apiURL .. ((cursor and "&cursor="..cursor) or ""))
-				end)
-
-				if success then
-					return Http:JSONDecode(Raw)
-				end
-				return nil
-			end
-
-			local NextCursor = nil
-			local targetServer = nil
-
-			for i = 1, 5 do 
-				local Servers = ListServers(NextCursor)
-
-				if Servers and Servers.data then
-					for _, server in pairs(Servers.data) do
-						if server.id ~= _currentServer and server.playing < server.maxPlayers then
-							targetServer = server
-							break
-						end
-					end
-				end
-
-				if targetServer then break end
-
-				if Servers and Servers.nextPageCursor then
-					NextCursor = Servers.nextPageCursor
-				else
-					break
-				end
-			end
-
-			if targetServer then
-				TPS:TeleportToPlaceInstance(_place, targetServer.id, plr)
-			else
-				ui:Notify({
-					Title = "Server Failure",
-					Text = "Couldnt find a different smallest server.",
-					Duration = 3,
-					StartPosition = UDim2.new(1, 0, 0.776, 0),
-					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-					TweenTime = 0.5
-				})
-			end
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Server Hop",
-		Callback = function()
-			local HttpService = game:GetService("HttpService")
-			
-			local PlaceId = game.PlaceId
-			local JobId = game.JobId
-			local Api = "https://games.roproxy.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
-
-			local success, result = pcall(function()
-				return game:HttpGet(Api) 
-			end)
-
-			if success then
-				local decoded = HttpService:JSONDecode(result)
-				if decoded and decoded.data then
-					local possibleServers = {}
-
-					for _, server in pairs(decoded.data) do
-						if server.id ~= JobId and server.playing < server.maxPlayers then
-							table.insert(possibleServers, server.id)
-						end
-					end
-
-					if #possibleServers > 0 then
-						local randomId = possibleServers[math.random(1, #possibleServers)]
-						TPS:TeleportToPlaceInstance(PlaceId, randomId, game.Players.LocalPlayer)
-					else
-						ui:Notify({
-							Title = "Server Failure",
-							Text = "No other servers found to hop to.",
-							Duration = 3,
-							StartPosition = UDim2.new(1, 0, 0.776, 0),
-							EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-							TweenTime = 0.5
-						})
-					end
-				end
-			else
-				ui:Notify({
-					Title = "Server Failure",
-					Text = "Failed to fetch server list: " .. tostring(result),
-					Duration = 3,
-					StartPosition = UDim2.new(1, 0, 0.776, 0),
-					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-					TweenTime = 0.5
-				})
-			end
-		end,
-	})
-	
-	ui:AddButton({
-		Text = "Rejoin server",
-		Callback = function()
-			local place = game.PlaceId
-			local jobId = game.JobId
-			local delay = 2
-
-			task.delay(delay, function()
-				TPS:TeleportToPlaceInstance(place, jobId, plr)
-			end)
-		end,
-	})
-
-	ui:AddSection("Ui Controls")
-
-	ui:AddButton({
-		Text = "Destroy Ui",
-		Callback = function()
-			ui:Destroy()
-			script:Destroy()
-		end
-	})
-
-	ui:AddButton({
-		Text = "Restart Ui",
-		Callback = function()
-			enteredkey = false
-			ui:Destroy()
-			task.wait(.5)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
-			script:Destroy()
-		end
-	})
-
-	ui:AddSeparator()
-
-	ui:AddSection("Credits")
-
-	ui:AddLabel("Made By SugaBlaz")
-	ui:AddLabel("Thanks to: Hmmm5650 for this cool ui library!")
-	ui:AddLabel("Version 0.5 BETA")
-
-	ui:AddSeparator()
-	
-	game:GetService("UserInputService").InputBegan:Connect(function(inp, gpe)
-		if gpe then return end
-		
-		if inp.KeyCode == Enum.KeyCode.F2 then
-			enteredkey = false
-			ui:Destroy()
-			task.wait(.5)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
-			script:Destroy()
-		end
-	end)
+	end,
+})
+
+ui:AddButton({
+	Text = "Rejoin server",
+	Callback = function()
+		local place = game.PlaceId
+		local jobId = game.JobId
+		local delay = 2
+
+		task.delay(delay, function()
+			TPS:TeleportToPlaceInstance(place, jobId, plr)
+		end)
+	end,
+})
+
+ui:AddSection("Ui Controls")
+
+ui:AddButton({
+	Text = "Destroy Ui",
+	Callback = function()
+		ui:Destroy()
+		script:Destroy()
+	end
+})
+
+ui:AddButton({
+	Text = "Restart Ui",
+	Callback = function()
+		enteredkey = false
+		ui:Destroy()
+		task.wait(.5)
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+		script:Destroy()
+	end
+})
+
+ui:AddSeparator()
+
+ui:AddSection("Credits")
+
+ui:AddLabel("Made By SugaBlaz")
+ui:AddLabel("Thanks to: Hmmm5650 for this cool ui library!")
+ui:AddLabel("Version 0.6 BETA")
+
+ui:AddSeparator()
+
+game:GetService("UserInputService").InputBegan:Connect(function(inp, gpe)
+	if gpe then return end
+
+	if inp.KeyCode == Enum.KeyCode.F2 then
+		enteredkey = false
+		ui:Destroy()
+		task.wait(.5)
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+		script:Destroy()
+	end
+end)
 end
 
 init()
