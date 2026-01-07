@@ -498,29 +498,37 @@ ui:AddToggle({
 })
 
 local function applyHitbox(player)
-	if player == game.Players.LocalPlayer then return end
-	local character = player.Character
-	local root = character and character:FindFirstChild("HumanoidRootPart")
+		if player == game.Players.LocalPlayer then return end
+		local character = player.Character
+		local root = character and character:FindFirstChild("HumanoidRootPart")
 
-	if root then
-		if not originalSizes[player] then
-			originalSizes[player] = root.Size
-		end
+		if root then
+			if not originalSizes[player] then
+				originalSizes[player] = root.Size
+			end
 
-		if hitboxEnabled and hbExpanderValue > 0 then
-			root.Size = Vector3.new(hbExpanderValue, hbExpanderValue, hbExpanderValue)
-			root.CanCollide = false
-		else
-			root.Size = originalSizes[player] or Vector3.new(2, 2, 1)
+			if hitboxEnabled and hbExpanderValue > 0 then
+				root.Size = Vector3.new(hbExpanderValue, hbExpanderValue, hbExpanderValue)
+				root.CanCollide = false
+				root.Transparency = 0.5
+			else
+				if originalSizes[player] then
+					root.Size = originalSizes[player]
+					root.CanCollide = true
+					originalSizes[player] = nil 
+				end
+			end
 		end
 	end
-end
 
-game:GetService("RunService").Heartbeat:Connect(function()
-	for _, p in ipairs(game.Players:GetPlayers()) do
-		applyHitbox(p)
-	end
-end)
+	
+	game:GetService("RunService").Heartbeat:Connect(function()
+		if not hitboxEnabled then return end 
+
+		for _, p in ipairs(game.Players:GetPlayers()) do
+			applyHitbox(p)
+		end
+	end)
 
 ui:AddSlider({
 	Text = "Hitbox Expander",
