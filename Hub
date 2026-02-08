@@ -5,8 +5,7 @@ local hum = character.Humanoid :: Humanoid
 local TS = game:GetService("TweenService")
 local TPS = game:GetService("TeleportService")
 local RS = game:GetService("RunService")
-local UILibrary = --loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
-	require(script.Parent.UI)
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
 local camera = workspace.Camera
 local Http = game:GetService("HttpService")
 local Api = "https://games.roproxy.com/v1/games/"
