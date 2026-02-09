@@ -97,23 +97,33 @@ function initServerList()
 	serverlistlayout.Parent = serverlist
 
 	local function getServers(cursor)
-		local placeId = game.PlaceId
-		local url = string.format("https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", tostring(placeId))
-		if cursor then url = url .. "&cursor=" .. cursor end
+	    local placeId = game.PlaceId
+	    local url = string.format("https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", tostring(placeId))
+	    if cursor then url = url .. "&cursor=" .. cursor end
 
-		local success, result = pcall(function()
-			return game:HttpGet(url)
-		end)
-
-		print(result)
-
-		if success and result then
-			local decodeSuccess, decodedData = pcall(function()
-				return Http:JSONDecode(result)
-			end)
-			return decodeSuccess and decodedData or nil
-		end
-		return nil
+	    local request = (syn and syn.request) or (http and http.request) or http_request or request
+	    
+	    if not request then 
+	        warn("Executor does not support custom requests!")
+	        return nil 
+	    end
+	
+	    local response = request({
+	        Url = url,
+	        Method = "GET",
+	        Headers = {
+	            ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+	            ["Content-Type"] = "application/json"
+	        }
+	    })
+	
+	    if response.Success and response.Body then
+	        local decodeSuccess, decodedData = pcall(function()
+	            return game:GetService("HttpService"):JSONDecode(response.Body)
+	        end)
+	        return decodeSuccess and decodedData or nil
+	    end
+	    return nil
 	end
 
 
