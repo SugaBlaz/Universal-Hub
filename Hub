@@ -105,6 +105,8 @@ function initServerList()
 			return game:HttpGet(url)
 		end)
 
+		print(result)
+
 		if success and result then
 			local decodeSuccess, decodedData = pcall(function()
 				return Http:JSONDecode(result)
@@ -1109,9 +1111,12 @@ function init()
 				TPS:TeleportToPlaceInstance(placeId, targetServer.id, plr)
 			else
 				ui:Notify({
-					Title = "Server Failure",
-					Text = "No smaller servers found.",
-					Duration = 3
+					Title = "Failed.",
+					Text = "No server found",
+					Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
 				})
 			end
 		end,
@@ -1139,7 +1144,10 @@ function init()
 					ui:Notify({
 						Title = "Server Failure",
 						Text = "No suitable servers found.",
-						Duration = 3
+						Duration = 3,
+						StartPosition = UDim2.new(1, 0, 0.776, 0),
+						EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+						TweenTime = 0.5
 					})
 				end
 			end
@@ -1199,11 +1207,11 @@ function init()
 	ui:AddSection("Credits")
 
 	ui:AddLabel("Made By SugaBlaz")
-	ui:AddLabel("Thanks to: Hmmm5650 for this cool ui library! I went and change it up a bit.")
-	ui:AddLabel("Version 0.6 BETA")
+	ui:AddLabel("Hmmm5650.")
 
 	ui:AddSeparator()
 
+	ui:AddLabel("Version 0.8 BETA")
 	ui:AddLabel("Running "..ui:GetVersion())
 
 	game:GetService("UserInputService").InputBegan:Connect(function(inp, gpe)
