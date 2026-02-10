@@ -1,0 +1,118 @@
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
+
+local function init()
+	local ui = UILibrary.new({
+		TitleText = "Suga's Script Hub",
+		Size = UDim2.new(0, 400, 0, 250),
+		Position = UDim2.new(0.5, -140, 0.5, -190),
+		TitleHeight = 30,
+		CornerRadius = 6,
+		ElementPadding = 6,
+		Font = Enum.Font.GothamBold,
+		TextSize = 12,
+		SectionHeight = 20,
+		UIStrokeThickness = 1,
+		SliderColor = Color3.fromRGB(54, 54, 54),
+		NotifcationSound = "rbxassetid://80833448337193",
+		ResetOnSpawn = false,
+		Key = nil,
+		KeyCallBack = function()
+			
+		end,
+	})
+	
+	ui:AddSection("Scripts")
+	
+	ui:AddButton({
+		Text = "Animation Logger",
+		Callback = function()
+			loadstring(game:HttpGet("https://pastefy.app/yw5RdVu3/raw"))()
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Infinite Yield",
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Namless Admin (Reworked, use at own risk)",
+		TextSize = 6,
+		Callback = function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/Nameless-Admin/main/Source.lua"))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Namless Admin (Orginal)",
+		TextSize = 10,
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Fedora Admin",
+
+		Callback = function()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/alexx1212/fedoratoomutch/main/toomucth'))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Cmd X",
+
+		Callback = function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source", true))()
+		end,
+	})
+	
+	ui:AddSeparator()
+	
+	ui:AddSection("Hubs")
+	
+	ui:AddButton({
+		Text = "Lalol Hub",
+
+		Callback = function()
+			loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-LALOL-Hub-Backdoor-Scanner-Without-the-Hint-52003"))()
+		end,
+	})
+	
+	ui:AddSeparator()
+	
+	ui:AddSection("Require Scripts (Auto Copy to clipboard)")
+	
+	ui:AddButton({
+		Text = "Gojo Moveset",
+		Callback = function()
+			setclipboard("require(14499140823)('UserNameHere', 'sorcerer')")
+		end,
+	})
+	
+	ui:AddButton({
+		Text = "Gojo V2 (PC)",
+		Callback = function()
+			setclipboard("require(103408394508146).unlimited('YourUserNameHere')")
+		end,
+	})
+
+	ui:AddLabel("Made By SugaBlaz")
+
+	ui:AddSeparator()
+
+	ui:AddLabel("Running "..ui:GetVerison())
+
+	ui:Notify({
+		Title = "Loaded",
+		Text = "Script Hub loaded",
+		Duration = 3,
+		StartPosition = UDim2.new(1, 0, 0.776, 0),
+		EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+		TweenTime = 0.5
+	})
+end
+
+init()
