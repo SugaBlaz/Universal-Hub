@@ -80,6 +80,8 @@ function init()
 		UIStrokeEnabled = true,
 		CornerRadius = UDim.new(0, 6),
 		UIStrokeThickness = 2,
+		Name = "SBEUILib",
+		URL = "https://i.ibb.co/xK20Pwph/SBEUILib.png"
 		Callback = function()
 			ui:ToggleFrameVisibility()
 		end,
