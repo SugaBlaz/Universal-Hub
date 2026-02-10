@@ -8,7 +8,6 @@ local RS = game:GetService("RunService")
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
 local camera = workspace.Camera
 local Http = game:GetService("HttpService")
-local Api = "https://games.roproxy.com/v1/games/"
 
 local enteredkey = false
 local doneloading = false
@@ -889,90 +888,98 @@ function init()
 	ui:AddSeparator()
 
 	ui:AddSection("Server")
-
+	
+	local PROXY_URL = "https://sbeuilib.liali22gk.workers.dev/" 
+	local AUTH_KEY = "@Suga1771KeyVoid!"
+	
+	-- Helper function to talk to your Worker
 	local function GetServerList(placeId, cursor, sortOrder)
-		local url = string.format(
-			"https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100%s",
-			tostring(placeId),
-			sortOrder or "Asc",
-			cursor and "&cursor=" .. cursor or ""
-		)
-
-		local success, result = pcall(function()
-			return game:HttpGet(url)
-		end)
-
-		if success and result then
-			return Http:JSONDecode(result)
-		end
-		return nil
+	    local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
+	    if not reqFunc then return nil end
+	
+	    local url = string.format("%s/v1/games/%s/servers/Public?limit=100", PROXY_URL, tostring(placeId))
+	    if cursor then url = url .. "&cursor=" .. cursor end
+	    if sortOrder then url = url .. "&sortOrder=" .. sortOrder end
+	
+	    local response = reqFunc({
+	        Url = url,
+	        Method = "GET",
+	        Headers = {
+	            ["X-SBEUI-Auth"] = AUTH_KEY,
+	            ["X-Roblox-Subdomain"] = "games"
+	        }
+	    })
+	
+	    if response.Success then
+	        local success, decoded = pcall(function() return Http:JSONDecode(response.Body) end)
+	        return success and decoded or nil
+	    end
+	    return nil
 	end
-
+	
+	--- BUTTON: JOIN SMALLEST SERVER ---
 	ui:AddButton({
-		Text = "Join Smallest Server",
-		Callback = function()
-			local placeId = game.PlaceId
-			local currentId = game.JobId
-			local targetServer = nil
-
-			-- We sort by Asc (Ascending) to get the lowest player counts first
-			local servers = GetServerList(placeId, nil, "Asc")
-
-			if servers and servers.data then
-				for _, server in pairs(servers.data) do
-					-- Ensure it's not our current server and has space
-					if server.id ~= currentId and server.playing > 0 and server.playing < server.maxPlayers then
-						targetServer = server
-						break
-					end
-				end
-			end
-
-			if targetServer then
-				TPS:TeleportToPlaceInstance(placeId, targetServer.id, plr)
-			else
-				ui:Notify({
-					Title = "Failed.",
-					Text = "No server found",
-					Duration = 3,
-					StartPosition = UDim2.new(1, 0, 0.776, 0),
-					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-					TweenTime = 0.5
-				})
-			end
-		end,
+	    Text = "Join Smallest Server",
+	    Callback = function()
+	        local placeId = game.PlaceId
+	        local currentId = game.JobId
+	        
+	        -- 'Asc' (Ascending) gives us 1 player servers first
+	        local servers = GetServerList(placeId, nil, "Asc")
+	
+	        if servers and servers.data then
+	            local targetServer = nil
+	            for _, server in pairs(servers.data) do
+	                -- Logic: Not current server, has players, but isn't full
+	                if server.id ~= currentId and server.playing > 0 and server.playing < server.maxPlayers then
+	                    targetServer = server
+	                    break
+	                end
+	            end
+	
+	            if targetServer then
+	                TPS:TeleportToPlaceInstance(placeId, targetServer.id, plr)
+	            else
+	                ui:Notify({
+	                    Title = "Failed",
+	                    Text = "No small servers found.",
+	                    Duration = 3
+	                })
+	            end
+	        end
+	    end,
 	})
-
+	
+	--- BUTTON: SERVER HOP ---
 	ui:AddButton({
-		Text = "Server Hop",
-		Callback = function()
-			local placeId = game.PlaceId
-			local currentId = game.JobId
-			local servers = GetServerList(placeId, nil, "Asc")
-
-			if servers and servers.data then
-				local possibleServers = {}
-				for _, server in pairs(servers.data) do
-					if server.id ~= currentId and server.playing < server.maxPlayers then
-						table.insert(possibleServers, server.id)
-					end
-				end
-
-				if #possibleServers > 0 then
-					local randomId = possibleServers[math.random(1, #possibleServers)]
-					TPS:TeleportToPlaceInstance(placeId, randomId, plr)
-				else
-					ui:Notify({
-						Title = "Server Failure",
-						Text = "No suitable servers found.",
-						Duration = 3,
-						StartPosition = UDim2.new(1, 0, 0.776, 0),
-						EndPosition = UDim2.new(0.724, 0, 0.776, 0),
-						TweenTime = 0.5
-					})
-				end
-			end
-		end,
+	    Text = "Server Hop",
+	    Callback = function()
+	        local placeId = game.PlaceId
+	        local currentId = game.JobId
+	        
+	        -- We get a random batch of 100 servers
+	        local servers = GetServerList(placeId, nil, "Desc")
+	
+	        if servers and servers.data then
+	            local possibleServers = {}
+	            for _, server in pairs(servers.data) do
+	                if server.id ~= currentId and server.playing < server.maxPlayers then
+	                    table.insert(possibleServers, server.id)
+	                end
+	            end
+	
+	            if #possibleServers > 0 then
+	                local randomId = possibleServers[math.random(1, #possibleServers)]
+	                TPS:TeleportToPlaceInstance(placeId, randomId, plr)
+	            else
+	                ui:Notify({
+	                    Title = "Hop Failed",
+	                    Text = "Could not find a new server.",
+	                    Duration = 3
+	                })
+	            end
+	        end
+	    end,
 	})
 
 	ui:AddButton({
