@@ -33,6 +33,10 @@ function init()
 		SliderColor = Color3.fromRGB(54, 54, 54),
 		NotifcationSound = "rbxassetid://80833448337193",
 		ResetOnSpawn = false,
+		Addons = {
+			[1] = "?hwid",
+			[2] = game:GetService("RbxAnalyticsService"):GetClientId()
+		}
 		Key = "https://sbeuilib.liali22gk.workers.dev/verify-key",
 		KeyLink = "https://rekonise.com/universal-hub-key-0rs04",
 		KeySystemEnabled = true,
