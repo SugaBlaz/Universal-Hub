@@ -14,189 +14,7 @@ local enteredkey = false
 local doneloading = false
 
 function initServerList()
-	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "ServerList"
-	ScreenGui.Parent = plrs.LocalPlayer.PlayerGui
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.ResetOnSpawn = true
-
-	local ServerFrame = Instance.new("Frame")
-	ServerFrame.Name = "ServerFrame"
-	ServerFrame.Size = UDim2.new(0, 362,0, 224)
-	ServerFrame.Position = UDim2.new(0.5, 0,0.5, 0)
-	ServerFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-	ServerFrame.BorderSizePixel = 0
-	ServerFrame.Active = true
-	ServerFrame.Draggable = true
-	ServerFrame.ClipsDescendants = true
-	ServerFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	ServerFrame.Parent = ScreenGui
-
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 6)
-	corner.Parent = ServerFrame
-
-	local uiStroke = Instance.new("UIStroke")
-	uiStroke.Thickness = 1
-	uiStroke.Color = Color3.fromRGB(60, 60, 60)
-	uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	uiStroke.Parent = ServerFrame
-
-	local title = Instance.new("Frame")
-	title.Name = "titlebar"
-	title.Size = UDim2.new(1, 0, 0.054, 30)
-	title.Position = UDim2.new(0, 0, 0, 0)
-	title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-	title.BorderSizePixel = 0
-	title.ZIndex = 2
-	title.Parent = ServerFrame
-
-	local keytitleCorner = Instance.new("UICorner")
-	keytitleCorner.CornerRadius = UDim.new(0, 6)
-	keytitleCorner.Parent = title
-
-	local titletext = Instance.new("TextLabel")
-	titletext.Name = "titletext"
-	titletext.Size = UDim2.new(0.944, 0, 1, 0)
-	titletext.Position = UDim2.new(0, 12, 0, 0)
-	titletext.BackgroundTransparency = 1
-	titletext.Text = "Server List"
-	titletext.TextColor3 = Color3.fromRGB(255, 255, 255)
-	titletext.TextXAlignment = Enum.TextXAlignment.Left
-	titletext.Font = Enum.Font.GothamBold
-	titletext.TextSize = 14
-	titletext.ZIndex = 3
-	titletext.Parent = title
-
-	local close = Instance.new("TextButton")
-	close.Name = "close"
-	close.Size = UDim2.new(0, 43, 0, 43)
-	close.Position = UDim2.new(0.878, 0, 0, 0)
-	close.BackgroundTransparency = 1
-	close.Text = "X"
-	close.TextColor3 = Color3.fromRGB(255, 0, 0)
-	close.Font = Enum.Font.GothamBold
-	close.TextSize = 30
-	close.ZIndex = 2
-	close.Parent = ServerFrame
-
-	local serverlist = Instance.new("ScrollingFrame")
-	serverlist.Name = "serverlist"
-	serverlist.Size = UDim2.new(1, 0, 1, -30)
-	serverlist.Position = UDim2.new(0, 0, 0, 30)
-	serverlist.BackgroundTransparency = 1
-	serverlist.Parent = ServerFrame
-
-	local serverlistcorner = Instance.new("UICorner")
-	serverlistcorner.CornerRadius = UDim.new(0, 6)
-	serverlistcorner.Parent = serverlist
-
-	local serverlistlayout = Instance.new("UIListLayout")
-	serverlistlayout.Padding = UDim.new(0.05, 0)
-	serverlistlayout.SortOrder = Enum.SortOrder.LayoutOrder
-	serverlistlayout.Parent = serverlist
-
-	local function getServers(cursor)
-	    local placeId = game.PlaceId
-	    local url = string.format("https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", tostring(placeId))
-	    if cursor then url = url .. "&cursor=" .. cursor end
-
-	    local request = (syn and syn.request) or (http and http.request) or http_request or request
-	    
-	    if not request then 
-	        warn("Executor does not support custom requests!")
-	        return nil 
-	    end
-	
-	    local response = request({
-	        Url = url,
-	        Method = "GET",
-	        Headers = {
-	            ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-	            ["Content-Type"] = "application/json"
-	        }
-	    })
-	
-	    if response.Success and response.Body then
-	        local decodeSuccess, decodedData = pcall(function()
-	            return game:GetService("HttpService"):JSONDecode(response.Body)
-	        end)
-	        return decodeSuccess and decodedData or nil
-	    end
-	    return nil
-	end
-
-
-	local function createtemp(serverid: string, players: number, maxplayers: number, region: string, ping: number)
-		local temp = Instance.new("Frame")
-		temp.Name = serverid
-		temp.Size = UDim2.new(1, 0, 0, 63)
-		temp.BackgroundColor3 = Color3.fromRGB(56, 56, 56)
-		temp.Parent = serverlist
-
-		local corner = Instance.new("UICorner")
-		corner.CornerRadius = UDim.new(0, 6)
-		corner.Parent = temp
-
-		local serveridtext = Instance.new("TextLabel")
-		serveridtext.Name = "serveridtext"
-		serveridtext.Size = UDim2.new(0.6, 0, 0.5, 0)
-		serveridtext.Position = UDim2.new(0, 0, 0, 0)
-		serveridtext.BackgroundTransparency = 1
-		serveridtext.Text = "Server ID: " .. serverid .. " | Region: " .. region .. " | Ping: " .. ping .. "ms"
-		serveridtext.Font = Enum.Font.GothamBold
-		serveridtext.TextScaled = true
-		serveridtext.TextColor3 = Color3.fromRGB(255, 255, 255)
-		serveridtext.Parent = temp
-
-		local playerstext = Instance.new("TextLabel")
-		playerstext.Name = "serveridtext"
-		playerstext.Size = UDim2.new(0.6, 0, 0.5, 0)
-		playerstext.Position = UDim2.new(0, 0, 0.5, 0)
-		playerstext.BackgroundTransparency = 1
-		playerstext.Text = "plrs: " .. players .. "/" .. maxplayers
-		playerstext.Font = Enum.Font.GothamBold
-		playerstext.TextScaled = true
-		playerstext.TextColor3 = Color3.fromRGB(255, 255, 255)
-		playerstext.Parent = temp
-
-		local join = Instance.new("TextButton")
-		join.Name = "join"
-		join.Size = UDim2.new(0.3, 0, 0.8, 0)
-		join.Position = UDim2.new(0.64, 0, 0.1, 0)
-		join.BackgroundColor3 = Color3.fromRGB(0, 157, 0)
-		join.Text = "Join"
-		join.Font = Enum.Font.GothamBold
-		join.TextSize = 30
-		join.TextColor3 = Color3.fromRGB(255, 255, 255)
-		join.Parent = temp
-
-		local corner2 = Instance.new("UICorner")
-		corner2.CornerRadius = UDim.new(0, 6)
-		corner2.Parent = join
-
-		join.MouseButton1Click:Connect(function()
-			TPS:TeleportToPlaceInstance(game.PlaceId, serverid, plr)
-		end)
-	end
-
-	task.spawn(function()
-		local response = getServers()
-
-		if response and response.data then
-			serverlist.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-			for i, v in pairs(response.data) do
-				createtemp(v.id, v.playing, v.maxPlayers, "Public", v.ping or 0)
-			end
-		else
-			warn("No servers found or API error occurred.")
-		end
-	end)
-
-	close.MouseButton1Click:Connect(function()
-		ServerFrame:Destroy()
-	end)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main"))()
 end
 
 function init()
@@ -1072,13 +890,6 @@ function init()
 
 	ui:AddSection("Server")
 
-	ui:AddButton({
-		Text = "Open Server List",
-		Callback = function()
-			initServerList()
-		end,
-	})
-
 	local function GetServerList(placeId, cursor, sortOrder)
 		local url = string.format(
 			"https://games.roproxy.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100%s",
@@ -1182,10 +993,17 @@ function init()
 	ui:AddSection("Executables")
 
 	ui:AddButton({
-		Text = "Suga's Imported Script Hub",
+		Text = "Suga's Script Hub",
 		TextSize = 9,
 		Callback = function()
-			
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Script%20Hub%20(Open%20Source)"))()
+		end,
+	})
+
+	ui:AddButton({
+		Text = "Open Server List",
+		Callback = function()
+			initServerList()
 		end,
 	})
 
