@@ -32,7 +32,7 @@ local enteredkey = false
 local doneloading = false
 
 function initServerList()
-	safeloadstring(https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main")
+	safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main")
 end
 
 function init()
