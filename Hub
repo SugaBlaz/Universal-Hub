@@ -5,17 +5,34 @@ local hum = character.Humanoid :: Humanoid
 local TS = game:GetService("TweenService")
 local TPS = game:GetService("TeleportService")
 local RS = game:GetService("RunService")
-local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI"))()
 local camera = workspace.Camera
 local Http = game:GetService("HttpService")
 local PROXY_URL = "https://sbeuilib.liali22gk.workers.dev/" 
 local AUTH_KEY = "@Suga1771KeyVoid!"
 
+function safeloadstring(url)
+	local code = game:HttpGet(url)
+
+	if #code < 50 then 
+	    print("Warning: The downloaded code is very short. Content: " .. code)
+	end
+	
+	local func, errorMessage = loadstring(code)
+	
+	if func then
+	    print("Script compiled! Executing...")
+	    func()
+	else
+	    warn("LOADSTRING FAILED: " .. tostring(errorMessage))
+	end
+end
+local UILibrary = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI")
+
 local enteredkey = false
 local doneloading = false
 
 function initServerList()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main"))()
+	safeloadstring(https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main")
 end
 
 function init()
