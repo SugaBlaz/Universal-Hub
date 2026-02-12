@@ -36,7 +36,7 @@ function init()
 		Addons = {
 			"?hwid=",
    		 	game:GetService("RbxAnalyticsService"):GetClientId()
-		}
+		},
 		Key = "https://sbeuilib.liali22gk.workers.dev/verify-key",
 		KeyLink = "https://rekonise.com/universal-hub-key-0rs04",
 		KeySystemEnabled = true,
