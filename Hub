@@ -11,21 +11,18 @@ local PROXY_URL = "https://sbeuilib.liali22gk.workers.dev/"
 local AUTH_KEY = "@Suga1771KeyVoid!"
 
 function safeloadstring(url)
-	local code = game:HttpGet(url)
-
-	if #code < 50 then 
-	    print("Warning: The downloaded code is very short. Content: " .. code)
-	end
-	
-	local func, errorMessage = loadstring(code)
-	
-	if func then
-	    print("Script compiled! Executing...")
-	    func()
-	else
-	    warn("LOADSTRING FAILED: " .. tostring(errorMessage))
-	end
+    local code = game:HttpGet(url)
+    local func, errorMessage = loadstring(code)
+    
+    if func then
+        print("Script compiled! Executing...")
+        return func()
+    else
+        warn("LOADSTRING FAILED: " .. tostring(errorMessage))
+        return nil
+    end
 end
+
 local UILibrary = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI")
 
 local enteredkey = false
