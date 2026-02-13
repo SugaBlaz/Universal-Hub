@@ -1000,7 +1000,7 @@ function init()
 			ui:Notify({
 				Title = "Graphics",
 	            Text = "Switching to " .. mode .. "...",
-	            Duration = 2
+	            Duration = 2,
 				StartPosition = UDim2.new(1, 0, 0.776, 0),
 				EndPosition = UDim2.new(0.724, 0, 0.776, 0),
 				TweenTime = 0.5
