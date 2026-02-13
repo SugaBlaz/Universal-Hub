@@ -23,6 +23,74 @@ function safeloadstring(url)
     end
 end
 
+local Lighting = game:GetService("Lighting")
+
+-- Store original lighting defaults to revert to later
+local Defaults = {
+    Brightness = Lighting.Brightness,
+    GlobalShadows = Lighting.GlobalShadows,
+    Ambient = Lighting.Ambient,
+    OutdoorAmbient = Lighting.OutdoorAmbient,
+    FogEnd = Lighting.FogEnd
+}
+
+local function ApplyGraphicsPreset(mode)
+    -- 1. Reset Lighting first
+    Lighting.Brightness = Defaults.Brightness
+    Lighting.GlobalShadows = Defaults.GlobalShadows
+    Lighting.Ambient = Defaults.Ambient
+    Lighting.OutdoorAmbient = Defaults.OutdoorAmbient
+    Lighting.FogEnd = Defaults.FogEnd
+    
+    -- Clear any existing "Fake RTX" effects
+    for _, v in pairs(Lighting:GetChildren()) do
+        if v:IsA("BloomEffect") or v:IsA("BlurEffect") then v:Destroy() end
+    end
+
+    -- 2. Handle Specific Preset Logic
+    if mode == "Lighting Fix" then
+        Lighting.Brightness = 2
+        Lighting.GlobalShadows = false
+        Lighting.Ambient = Color3.new(1, 1, 1)
+    elseif mode == "Fake RTX" then
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 0.5
+        bloom.Size = 24
+        bloom.Threshold = 0.8
+        local blur = Instance.new("BlurEffect", Lighting)
+        blur.Size = 4
+    end
+
+    -- 3. Handle Heavy Material Changes (Potato Modes)
+    if mode == "Potato Mode" or mode == "Safe Potato Mode" or mode == "Default" then
+        local isPotato = (mode:find("Potato"))
+        local descendants = game:GetDescendants()
+        local budget = 250
+        local count = 0
+
+        -- Flowchart of how this budgeted loop prevents crashes:
+        -- 
+
+        for _, v in pairs(descendants) do
+            if mode == "Safe Potato Mode" or mode == "Default" then
+                count = count + 1
+                if count >= budget then count = 0 task.wait() end
+            end
+
+            if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") then
+                v.Material = isPotato and Enum.Material.SmoothPlastic or Enum.Material.Plastic
+                v.Reflectance = isPotato and 0 or v.Reflectance
+            elseif v:IsA("Decal") or v:IsA("Texture") then
+                v.Transparency = isPotato and 1 or 0
+            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                v.Enabled = not isPotato
+            end
+        end
+    end
+    
+    print("Preset Applied: " .. mode)
+end
+
 local UILibrary = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/MainUI")
 
 local enteredkey = false
@@ -921,6 +989,72 @@ function init()
 	})
 
 	ui:AddSeparator()
+
+	ui:AddSection("Visuals & Graphics")
+	
+	ui:AddDropdown({
+	    Text = "Graphics Preset",
+	    Default = "Default",
+	    Options = {"Default", "Lighting Fix", "Fake RTX", "Potato Mode", "Safe Potato Mode"},
+	    Callback = function(mode)
+			ui:Notify({
+				Title = "Graphics",
+	            Text = "Switching to " .. mode .. "...",
+	            Duration = 2
+				StartPosition = UDim2.new(1, 0, 0.776, 0),
+				EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+				TweenTime = 0.5
+			})
+	
+	        if mode == "Potato Mode" then
+	            ApplyGraphicsPreset("Potato Mode")
+	        else
+	            task.spawn(function()
+	                ApplyGraphicsPreset(mode)
+	            end)
+	        end
+	    end
+	})
+	
+	ui:AddToggle({
+	    Text = "Remove Textures/Decals",
+	    Default = false,
+	    Callback = function(state)
+	        for _, v in pairs(game:GetDescendants()) do
+	            if v:IsA("Decal") or v:IsA("Texture") then
+	                v.Transparency = state and 1 or 0
+	            end
+	        end
+	    end
+	})
+
+	ui:AddSeparator()
+	
+	local Performance = ui:AddSection("System")
+	
+	ui:AddButton({
+	    Text = "Unlock FPS (999)",
+	    Callback = function()
+	        if setfpscap then
+	            setfpscap(999)
+	            print("FPS Unlocked!")
+	        else
+	            warn("Your executor doesn't support setfpscap")
+	        end
+	    end
+	})
+	
+	-- Real-time Stats Label
+	local statsLabel = ui:AddLabel("Ping: ... | FPS: ...")
+	
+	-- Loop to update stats
+	task.spawn(function()
+	    while task.wait(1) do
+	        local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+	        local ping = math.floor(game:GetService("Players").LocalPlayer:GetNetworkPing() * 1000)
+	        statsLabel.Text = "Ping: " .. ping .. "ms | FPS: " .. fps
+	    end
+	end)
 
 	ui:AddSection("Ui Controls")
 
