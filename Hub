@@ -1044,10 +1044,8 @@ function init()
 	    end
 	})
 	
-	-- Real-time Stats Label
 	local statsLabel = ui:AddLabel("Ping: ... | FPS: ...")
 	
-	-- Loop to update stats
 	task.spawn(function()
 	    while task.wait(1) do
 	        local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
@@ -1072,7 +1070,7 @@ function init()
 			enteredkey = false
 			ui:Destroy()
 			task.wait(.5)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+			safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub")
 			script:Destroy()
 		end
 	})
@@ -1097,7 +1095,7 @@ function init()
 			doneloading = false
 			ui:Destroy()
 			task.wait(.5)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub"))()
+			safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub")
 			script:Destroy()
 		end
 			
