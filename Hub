@@ -159,7 +159,7 @@ function init()
 	ui:MakeDraggableButton({
 		BGTransparency = 0,
 		Size = UDim2.new(0, 50, 0, 50),
-		BGColor = Color3.fromRGB(128, 128, 128)
+		BGColor = Color3.fromRGB(128, 128, 128),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		UIStrokeEnabled = true,
 		CornerRadius = UDim.new(0, 6),
