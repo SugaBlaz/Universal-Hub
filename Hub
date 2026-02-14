@@ -105,7 +105,7 @@ function init()
 		TitleText = "Universal Hub",
 		Size = UDim2.new(0, 175, 0, 225),
 		Position = UDim2.new(0.5, -140, 0.5, -190),
-		TitleHeight = 30,
+		TitleHeight = 65,
 		CornerRadius = 6,
 		ElementPadding = 6,
 		Font = Enum.Font.GothamBold,
@@ -157,8 +157,9 @@ function init()
 	until doneloading
 	
 	ui:MakeDraggableButton({
-		BGTransparency = 1,
+		BGTransparency = 0,
 		Size = UDim2.new(0, 50, 0, 50),
+		BGColor = Color3.fromRGB(128, 128, 128)
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		UIStrokeEnabled = true,
 		CornerRadius = UDim.new(0, 6),
@@ -1017,7 +1018,7 @@ function init()
 	})
 	
 	ui:AddToggle({
-	    Text = "Remove Textures/Decals",
+	    Text = "Remove Textures",
 	    Default = false,
 	    Callback = function(state)
 	        for _, v in pairs(game:GetDescendants()) do
@@ -1037,9 +1038,15 @@ function init()
 	    Callback = function()
 	        if setfpscap then
 	            setfpscap(999)
-	            print("FPS Unlocked!")
 	        else
-	            warn("Your executor doesn't support setfpscap")
+	            ui:Notify({
+					Title = "Failed",
+		            Text = "Sorry, your executor doesnt support this function.",
+		            Duration = 3,
+					StartPosition = UDim2.new(1, 0, 0.776, 0),
+					EndPosition = UDim2.new(0.724, 0, 0.776, 0),
+					TweenTime = 0.5
+				})
 	        end
 	    end
 	})
