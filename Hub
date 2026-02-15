@@ -1062,6 +1062,8 @@ function init()
 	    end
 	end)
 
+	ui:AddSeparator()
+
 	ui:AddSection("Ui Controls")
 
 	ui:AddButton({
