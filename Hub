@@ -105,7 +105,7 @@ function init()
 		TitleText = "Universal Hub",
 		Size = UDim2.new(0, 175, 0, 225),
 		Position = UDim2.new(0.5, -140, 0.5, -190),
-		TitleHeight = 65,
+		TitleHeight = 30,
 		CornerRadius = 6,
 		ElementPadding = 6,
 		Font = Enum.Font.GothamBold,
