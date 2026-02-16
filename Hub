@@ -1074,6 +1074,18 @@ function init()
 		end
 	})
 
+	ui:AddKeybind({
+	    Text = "Destroy Ui",
+	    Default = Enum.KeyCode.F1,
+	    Callback = function()
+	        ui:Destroy()
+			script:Destroy()
+	    end,
+	    ChangedCallback = function(newKey)
+	        print("Bind changed to: " .. newKey.Name)
+	    end
+	})
+
 	ui:AddButton({
 		Text = "Restart Ui",
 		Callback = function()
@@ -1085,6 +1097,18 @@ function init()
 		end
 	})
 
+	ui:AddKeybind({
+	    Text = "Restart Ui",
+	    Default = Enum.KeyCode.F2,
+	    Callback = function()
+	        ui:Destroy()
+			script:Destroy()
+	    end,
+	    ChangedCallback = function(newKey)
+	        print("Bind changed to: " .. newKey.Name)
+	    end
+	})
+
 	ui:AddSeparator()
 
 	ui:AddSection("Credits")
@@ -1094,29 +1118,8 @@ function init()
 	ui:AddSeparator()
 	
 	ui:AddLabel("Made By SugaBlaz")
-	ui:AddLabel("Version 0.9")
+	ui:AddLabel("Version 1.1")
 	ui:AddLabel("Running "..ui:GetVersion())
-
-	game:GetService("UserInputService").InputBegan:Connect(function(inp, gpe)
-		if gpe then return end
-
-		if inp.KeyCode == Enum.KeyCode.F2 then
-			enteredkey = false
-			doneloading = false
-			ui:Destroy()
-			task.wait(.5)
-			safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Hub")
-			script:Destroy()
-		end
-			
-		if inp.KeyCode == Enum.KeyCode.F1 then
-			doneloading = false
-			enteredkey = false
-			ui:Destroy()
-			task.wait(.5)
-			script:Destroy()
-		end
-	end)
 end
 
 init()
