@@ -101,7 +101,7 @@ function initServerList()
 end
 
 function init()
-	local ui = UILibrary.new({
+	local ui = UILibrary.Main.new({
 		TitleText = "Universal Hub",
 		Size = UDim2.new(0, 175, 0, 225),
 		Position = UDim2.new(0.5, -140, 0.5, -190),
