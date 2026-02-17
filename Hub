@@ -122,7 +122,7 @@ function init()
 		KeySystemEnabled = true,
 		TabPadding = 10,
 		UseOwnTheme = false,
-		Theme = "Volanic",
+		Theme = "Volcanic",
 		KeyCallBack = function()
 			enteredkey = true
 		end,
