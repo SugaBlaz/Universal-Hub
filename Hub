@@ -121,6 +121,8 @@ function init()
 		KeyLink = "https://rekonise.com/universal-hub-key-0rs04",
 		KeySystemEnabled = true,
 		TabPadding = 10,
+		UseOwnTheme = false,
+		Theme = "Volanic",
 		KeyCallBack = function()
 			enteredkey = true
 		end,
