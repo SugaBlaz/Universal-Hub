@@ -96,7 +96,7 @@ if not repStore:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 end
 
 -- // NEBULA UI INITIALIZATION //
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua"))()
+local Library = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua")
 
 local uiDestroyed = false 
 
@@ -1328,28 +1328,28 @@ function init()
 	ExecTab:CreateButton({
 		Name = "Suga's Imported Script Hub",
 		Callback = function()
-			safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Script%20Hub%20(Open%20Source)")
+			--safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Universal-Hub/refs/heads/main/Script%20Hub%20(Open%20Source)")
 		end,
 	})
 
 	ExecTab:CreateButton({
 		Name = "Open Server List",
 		Callback = function()
-			initServerList()
+			--initServerList()
 		end,
 	})
 	
 	ExecTab:CreateButton({
 		Name = "Dex Explorer",
 		Callback = function()
-			safeloadstring("https://rawscripts.net/raw/Universal-Script-Keyless-mobile-dex-17888")
+			--safeloadstring("https://rawscripts.net/raw/Universal-Script-Keyless-mobile-dex-17888")
 		end,
 	})
 	
 	ExecTab:CreateButton({
 		Name = "Infinix Executor",
 		Callback = function()
-			safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Owned-Scripts/refs/heads/main/Infinix%20Executor")
+			--safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Owned-Scripts/refs/heads/main/Infinix%20Executor")
 		end,
 	})
 
