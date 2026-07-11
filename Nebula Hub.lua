@@ -97,7 +97,7 @@ end
 
 -- // NEBULA UI INITIALIZATION //
 local Library = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua")
-
+print("gto")
 local uiDestroyed = false 
 
 function init()
