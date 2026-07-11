@@ -96,7 +96,7 @@ if not repStore:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 end
 
 -- // NEBULA UI INITIALIZATION //
-local Library = require(script.Parent.ModuleScript) --loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua"))()
 
 local uiDestroyed = false 
 
@@ -671,6 +671,9 @@ function init()
 
 						local dir = (targetPos - myHrp.Position).Unit
 						myHrp.CFrame = CFrame.new(myHrp.Position, myHrp.Position + Vector3.new(dir.X, 0, dir.Z))
+					else
+						aimconn:Disconnect()
+						aimconn = nil
 					end
 				end)
 			else
