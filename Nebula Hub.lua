@@ -86,7 +86,7 @@ local function ApplyGraphicsPreset(mode)
 end
 
 function initServerList()
-	safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main")
+	--safeloadstring("https://raw.githubusercontent.com/SugaBlaz/Server_Lister/refs/heads/main/Main")
 end
 
 if not repStore:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
