@@ -12,7 +12,7 @@ local CoreGui = game:GetService("CoreGui")
 local PROXY_URL = "https://sbeuilib.liali22gk.workers.dev/" 
 local AUTH_KEY = "@Suga1771KeyVoid!"
 
-function safeloadstring(url)
+--[[function safeloadstring(url)
 	local code = game:HttpGet(url)
 	local func, errorMessage = loadstring(code)
 
@@ -23,7 +23,7 @@ function safeloadstring(url)
 		warn("LOADSTRING FAILED: " .. tostring(errorMessage))
 		return nil
 	end
-end
+end]]
 
 local Lighting = game:GetService("Lighting")
 
@@ -96,8 +96,7 @@ if not repStore:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 end
 
 -- // NEBULA UI INITIALIZATION //
-local Library = safeloadstring("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua")
-print("gto")
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SugaBlaz/UI-Library/refs/heads/main/Nebula%20UI.lua"))()
 local uiDestroyed = false 
 
 function init()
